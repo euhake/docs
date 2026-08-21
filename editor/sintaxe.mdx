@@ -3,16 +3,13 @@ title: "Sintaxe"
 description: "A AllBay usa Liquid padrão — {% %} para lógica e {{ }} para saída."
 ---
 
-Os temas da AllBay são renderizados com **Liquid**, usando os **delimitadores
-padrão**:
+Os temas da AllBay são renderizados com **Liquid**, usando os **delimitadores padrão**:
 
 - `{% ... %}` — **lógica** (tags: condicionais, laços, includes).
 - `{{ ... }}` — **saída** (imprime o valor de uma variável).
 
 <Note>
-  Diferente de outras plataformas que adotam delimitadores próprios, a AllBay usa
-  o Liquid **padrão**. Assim, realce de sintaxe, formatadores e assistentes de IA
-  funcionam sem configuração especial — é o mesmo Liquid do mercado.
+  A AllBay usa o Liquid **padrão**. Assim, realce de sintaxe, formatadores e assistentes de IA funcionam sem configuração especial.
 </Note>
 
 ## Saída de variáveis
@@ -48,8 +45,7 @@ Operadores: `==`, `!=`, `>`, `<`, `>=`, `<=`, `and`, `or`, `contains`.
 {% endfor %}
 ```
 
-Variáveis do laço: `forloop.index` (começa em 1), `forloop.index0` (em 0),
-`forloop.first`, `forloop.last`, `forloop.length`.
+Variáveis do laço: `forloop.index` (começa em 1), `forloop.index0` (em 0), `forloop.first`, `forloop.last`, `forloop.length`.
 
 ## Variáveis locais
 
@@ -74,18 +70,14 @@ Ver a lista completa em [Filtros](/editor/filtros).
 
 ## Componentes e layouts
 
-Use `{% render %}` para incluir um componente, e a cadeia de layouts para
-envolver a página:
+Use `{% render %}` para incluir um componente, e a cadeia de layouts para envolver a página:
 
 ```liquid
 {% render 'components/navbar' %}
 ```
 
-Ver [Tags](/editor/tags) e [Estrutura](/editor/estrutura) para os detalhes de
-componentes, layouts e o carregamento de dados com `{% load %}`.
+Ver [Tags](/editor/tags) e [Estrutura](/editor/estrutura) para os detalhes de componentes, layouts e o carregamento de dados com `{% load %}`.
 
 <Warning>
-  Por segurança, apenas um conjunto controlado de tags e filtros é permitido. Tags
-  perigosas (que leem arquivos arbitrários, por exemplo) são bloqueadas pelo
-  servidor. Ver [Tags](/editor/tags).
+  Por segurança, apenas um conjunto controlado de tags e filtros é permitido. Tags perigosas (que leem arquivos arbitrários, por exemplo) são bloqueadas pelo servidor. Ver [Tags](/editor/tags).
 </Warning>

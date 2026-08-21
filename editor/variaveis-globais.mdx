@@ -3,8 +3,7 @@ title: "Variáveis Globais"
 description: "Objetos disponíveis em todas as páginas do tema."
 ---
 
-Estas variáveis estão disponíveis em **todas** as páginas. Cada página também
-recebe variáveis próprias (ver [Páginas](/editor/paginas)).
+Estas variáveis estão disponíveis em **todas** as páginas. Cada página também recebe variáveis próprias (ver [Páginas](/editor/paginas)).
 
 ## `store` — a loja
 
@@ -28,9 +27,7 @@ recebe variáveis próprias (ver [Páginas](/editor/paginas)).
 | `theme` | objeto | O mesmo objeto de [`theme`](#theme) |
 
 <Note>
-  Existe também um objeto `shop` (identidade nativa: `name`, `slug`, `id`,
-  `logo_url`, `banner_url`). Para paridade com temas Liquid do mercado, **use
-  `store`**.
+  Existe também um objeto `shop` (identidade nativa: `name`, `slug`, `id`, `logo_url`, `banner_url`). Prefira **`store`**, que traz os dados completos da loja.
 </Note>
 
 ## `theme` — aparência
@@ -46,9 +43,7 @@ recebe variáveis próprias (ver [Páginas](/editor/paginas)).
 
 ## `config` e `settings`
 
-`config` é o objeto que o [schema](/editor/schema) preenche (paleta + seções +
-valores do dono). A chave converte hífens em underscores (`primary-color` →
-`config.primary_color`). `settings` é o objeto cru dos valores do dono.
+`config` é o objeto que o [schema](/editor/schema) preenche (paleta \+ seções \+ valores do dono). A chave converte hífens em underscores (`primary-color` → `config.primary_color`). `settings` é o objeto cru dos valores do dono.
 
 ```liquid
 <style>:root{ --primary: {{ config.primary_color | hex_to_hsl }}; }</style>
@@ -69,9 +64,7 @@ valores do dono). A chave converte hífens em underscores (`primary-color` →
 
 ## `categories` e `category`
 
-Array de categorias (`categories`) e a categoria atual na página de coleção
-(`category`). Campos: `name`, `slug`, `emoji`, `image`, `banner`,
-`product_count`, `sub_categories[]`, `products[]`.
+Array de categorias (`categories`) e a categoria atual na página de coleção (`category`). Campos: `name`, `slug`, `emoji`, `image`, `banner`, `product_count`, `sub_categories[]`, `products[]`.
 
 ## `products`, `packages`, `product`
 
@@ -96,9 +89,7 @@ Campos principais do produto:
 
 ## `socials` e `gateways`
 
-- `socials` — sempre traz todas as redes (null quando não configurada):
-  `instagram`, `discord`, `youtube`, `twitter`, `facebook`, `tiktok`,
-  `whatsapp`, `telegram`.
+- `socials` — sempre traz todas as redes (null quando não configurada): `instagram`, `discord`, `youtube`, `twitter`, `facebook`, `tiktok`, `whatsapp`, `telegram`.
 - `gateways` — array de métodos de pagamento: `{ name (ex: "PIX"), display, fee,
   is_percentage_fee, provider, max_installments, … }`.
 
@@ -108,14 +99,10 @@ Campos principais do produto:
 
 ## `order`, `posts`, `post`, `cart`
 
-- `order` — na página de pedido/pagamento: `status`, `price`, `price_display`,
-  `pix_code`, `qr_code` (data-URI), `gateway`, `packages[]`, `deliveries[]`,
-  `variables[]`, `client_name`, `access_token`.
+- `order` — na página de pedido/pagamento: `status`, `price`, `price_display`, `pix_code`, `qr_code` (data-URI), `gateway`, `packages[]`, `deliveries[]`, `variables[]`, `client_name`, `access_token`.
 - `posts` — índice do blog: `{ data:[…], meta:{ total, per_page, current_page,
-  last_page, … } }`. `post` — o post (`title`, `slug`, `content`, `image`,
-  `published_at`).
-- `cart` — `{ items, items_count, total }` (vazio no servidor; o SDK hidrata no
-  cliente).
+  last_page, … } }`. `post` — o post (`title`, `slug`, `content`, `image`, `published_at`).
+- `cart` — `{ items, items_count, total }` (vazio no servidor; o SDK hidrata no cliente).
 
 ## Requisição
 
@@ -130,9 +117,4 @@ Injete o SDK e o CSS base da AllBay:
 <script src="{{ allbay_script }}"></script>
 ```
 
-<Warning>
-  Use **`allbay_script`** / **`allbay_style`** (não `centralcart_script`). E o
-  bloco de dados do negócio (`store.business` — CNPJ, e-mail, horários) ainda não
-  é exposto ao tema; proteja com `{% if store.business != blank %}` até estar
-  disponível.
-</Warning>
+Use **`allbay_script`** para o SDK e **`allbay_style`** para o CSS base.

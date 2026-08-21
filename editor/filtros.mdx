@@ -20,7 +20,7 @@ Apenas filtros da allowlist são permitidos.
 | `format_price` | Alias de `money` | `29.90` → `R$ 29,90` |
 | `hex_to_hsl` | Hex → HSL (sem a função `hsl()`) | `#ff0000` → `0 100% 50%` |
 | `cdn_url` | URL assinada de imagem no CDN (a partir do hash) | `{{ p.image \| cdn_url: 'products', p.id }}` |
-| `cdn` | Alias de `cdn_url` | |
+| `cdn` | Alias de `cdn_url` |  |
 | `asset_url` | Caminho seguro pra um arquivo do tema | `{{ 'app.js' \| asset_url }}` → `/assets/app.js` |
 | `compact_number` | Número compacto | `1200` → `1.2K` |
 | `stars` | Estrelas cheias/vazias | `4` → `★★★★☆` |
@@ -28,26 +28,20 @@ Apenas filtros da allowlist são permitidos.
 | `percent_off` | % de desconto (preço vs comparação) | `→ 20%` |
 | `slugify` | Texto → slug | `Plano VIP` → `plano-vip` |
 | `time_ago` | Tempo relativo (pt-BR) | `→ há 2 dias` |
-| `date_format` | Data por extenso (pt-BR) | |
+| `date_format` | Data por extenso (pt-BR) |  |
 | `placeholder` | Usa o fallback se o valor está vazio | `{{ x \| placeholder: '—' }}` |
 | `default` | Fallback só pra `nil`/`false`/`""`/`[]` (o zero passa) | `{{ 0 \| default: '100+' }}` → `0` |
 
-<Warning>
-  Use `money`/`format_price` para preços — o `cdn_url` recebe o **hash** da
-  imagem (não uma URL pronta) e assina a URL final. Não existe `asset_content`
-  (para inline de conteúdo) — apenas `asset_url` (referência por caminho).
-</Warning>
+<Note>
+  Use `money`/`format_price` para preços — o `cdn_url` recebe o **hash** da imagem (não uma URL pronta) e assina a URL final.
+</Note>
 
 ## Filtros nativos
 
 Também estão disponíveis os filtros padrão do Liquid:
 
-- **Texto:** `upcase`, `downcase`, `capitalize`, `truncate`, `truncatewords`,
-  `strip_html`, `escape`, `newline_to_br`, `replace`, `append`, `prepend`,
-  `split`, `strip`, `lstrip`, `rstrip`, `url_encode`, `url_decode`.
-- **Número:** `plus`, `minus`, `times`, `divided_by`, `modulo`, `round`, `floor`,
-  `ceil`, `abs`, `at_least`, `at_most`.
-- **Array:** `size`, `first`, `last`, `join`, `sort`, `sort_natural`, `reverse`,
-  `map`, `where`, `uniq`, `compact`, `concat`.
+- **Texto:** `upcase`, `downcase`, `capitalize`, `truncate`, `truncatewords`, `strip_html`, `escape`, `newline_to_br`, `replace`, `append`, `prepend`, `split`, `strip`, `lstrip`, `rstrip`, `url_encode`, `url_decode`.
+- **Número:** `plus`, `minus`, `times`, `divided_by`, `modulo`, `round`, `floor`, `ceil`, `abs`, `at_least`, `at_most`.
+- **Array:** `size`, `first`, `last`, `join`, `sort`, `sort_natural`, `reverse`, `map`, `where`, `uniq`, `compact`, `concat`.
 - **Data:** `date` (ex: `{{ post.created_at | date: '%d/%m/%Y' }}`).
 - **JSON:** `json` (serializa um objeto — útil em `pages/package` e `checkout`).

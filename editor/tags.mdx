@@ -3,14 +3,11 @@ title: "Tags"
 description: "Tags de lógica e as tags próprias da AllBay — load, section, render."
 ---
 
-Tags ficam entre `{% %}`. Por segurança, apenas um conjunto controlado é
-permitido — qualquer tag fora da lista **não compila**.
+Tags ficam entre `{% %}`. Por segurança, apenas um conjunto controlado é permitido — qualquer tag fora da lista **não compila**.
 
 ## Controle de fluxo
 
-Padrão do Liquid: `if`, `elsif`, `else`, `unless`, `case`/`when`, `for`,
-`tablerow`, `cycle`, `break`, `continue`, `assign`, `capture`, `increment`,
-`decrement`, `echo`, `comment`, `raw`. Ver exemplos em [Sintaxe](/editor/sintaxe).
+Padrão do Liquid: `if`, `elsif`, `else`, `unless`, `case`/`when`, `for`, `tablerow`, `cycle`, `break`, `continue`, `assign`, `capture`, `increment`, `decrement`, `echo`, `comment`, `raw`. Ver exemplos em [Sintaxe](/editor/sintaxe).
 
 ## `render` — componentes
 
@@ -30,8 +27,7 @@ Renderiza `sections/<nome>`. Profundidade máxima de aninhamento: 6.
 
 ## `load` — dados dinâmicos
 
-Carrega dados da loja direto no template. O resultado vira uma variável com o
-nome da entidade (ou o `as <alias>`):
+Carrega dados da loja direto no template. O resultado vira uma variável com o nome da entidade (ou o `as <alias>`):
 
 ```liquid
 {% load "products", limit: 8, category_id: 3 %}
@@ -44,8 +40,7 @@ nome da entidade (ou o `as <alias>`):
 ```
 
 <Note>
-  Se o carregamento não retorna nada, a variável **não é sobrescrita** — útil pra
-  dados injetados pelo servidor (ex: `orders` na área do cliente).
+  Se o carregamento não retorna nada, a variável **não é sobrescrita** — útil pra dados injetados pelo servidor (ex: `orders` na área do cliente).
 </Note>
 
 ### Entidades disponíveis
@@ -58,7 +53,7 @@ Você pode carregar exatamente estas entidades (até 12 `load` por página):
 | `packages` | `limit`, `page`, `category_id`, `id` | alias de `products`; `id:` = lista em destaque |
 | `product` | `slug` | um produto pelo slug |
 | `categories` | `limit` (20/50) | árvore de categorias |
-| `product_reviews` | `slug`, `limit` | avaliações + resumo de um produto |
+| `product_reviews` | `slug`, `limit` | avaliações \+ resumo de um produto |
 | `package_feedbacks` | `package_id`, `limit` | avaliações por id (`{data, size, total}`) |
 | `feedbacks` | `limit`, `list` | `{feedback_settings, feedbacks[]}` da loja |
 | `posts` | `limit`, `page` | índice do blog (`{data, meta}`) |
@@ -68,14 +63,5 @@ Você pode carregar exatamente estas entidades (até 12 `load` por página):
 | `checkout_fields` | `limit` | alias de `variables` |
 
 <Info>
-  **`orders`** (pedidos do cliente) não é carregado por `load` — é **injetado
-  pelo servidor** na área do cliente (`pages/account/orders.liquid`). Um
-  `{% load 'orders' %}` num template preserva esse global injetado. Dados de conta
-  (afiliado, total gasto) hidratam pelo SDK no cliente.
+  **`orders`** (pedidos do cliente) não é carregado por `load` — é **injetado pelo servidor** na área do cliente (`pages/account/orders.liquid`). Um `{% load 'orders' %}` num template preserva esse global injetado.
 </Info>
-
-<Warning>
-  Loaders de **afiliado** (`affiliate`, `affiliate_settings`), **total gasto**
-  (`user_spent`) e **widgets** (`widget`) ainda **não** existem na AllBay — são
-  dados de conta/sessão que a ingress pública de SSR não expõe. Estão no roadmap.
-</Warning>

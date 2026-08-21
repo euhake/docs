@@ -3,10 +3,7 @@ title: "Introdução"
 description: "Personalize a aparência e o comportamento da sua loja AllBay com código."
 ---
 
-O editor de temas da AllBay permite personalizar por completo a aparência e o
-comportamento da sua loja usando **Liquid** — a mesma linguagem de template de
-lojas online consagrada pelo mercado — com objetos, tags e filtros próprios da
-plataforma.
+O editor de temas da AllBay permite personalizar por completo a aparência e o comportamento da sua loja usando **Liquid**, com objetos, tags e filtros próprios da plataforma.
 
 ## O que você pode fazer
 
@@ -17,22 +14,30 @@ plataforma.
 
 ## Temas base
 
-A galeria traz temas prontos que você pode **usar direto (linked)** ou
-**personalizar (fork)**:
+A galeria traz temas prontos que você pode **usar direto (linked)** ou **personalizar (fork)**:
 
 <CardGroup cols={3}>
-  <Card title="Source" />
-  <Card title="Neon" />
-  <Card title="Lumina" />
-  <Card title="Kopy" />
-  <Card title="Prisma" />
-  <Card title="Eclipse" />
+  <Card title="Source">
+  </Card>
+
+  <Card title="Neon">
+  </Card>
+
+  <Card title="Lumina">
+  </Card>
+
+  <Card title="Kopy">
+  </Card>
+
+  <Card title="Prisma">
+  </Card>
+
+  <Card title="Eclipse">
+  </Card>
 </CardGroup>
 
 <Info>
-  **Linked** aponta para o tema da galeria e **atualiza sozinho** quando o tema
-  base é atualizado. **Fork** é uma cópia editável e independente. Ver
-  [Estrutura](/editor/estrutura).
+  **Linked** aponta para o tema da galeria e **atualiza sozinho** quando o tema base é atualizado. **Fork** é uma cópia editável e independente. Ver [Estrutura](/editor/estrutura).
 </Info>
 
 ## Como criar um tema
@@ -42,12 +47,10 @@ A galeria traz temas prontos que você pode **usar direto (linked)** ou
     Vá em **Aparência → Template** no painel da sua loja.
   </Step>
   <Step title="Escolha um tema">
-    Selecione um tema da galeria (fica **linked** por padrão) ou clique em
-    **Personalizar código** para forkar uma cópia editável.
+    Selecione um tema da galeria (fica **linked** por padrão) ou clique em **Personalizar código** para forkar uma cópia editável.
   </Step>
   <Step title="Ative">
-    **Ativar** coloca o tema no ar. Uma loja nova nasce em modo Liquid sem tema —
-    é só escolher um.
+    **Ativar** coloca o tema no ar. Uma loja nova nasce em modo Liquid sem tema — é só escolher um.
   </Step>
 </Steps>
 
@@ -55,27 +58,26 @@ A galeria traz temas prontos que você pode **usar direto (linked)** ou
 
 <CardGroup cols={2}>
   <Card title="Editor Web (Studio)" icon="window">
-    Editor de código integrado ao painel, com árvore de arquivos, realce de
-    sintaxe, abas e **pré-visualização ao vivo**. Nada pra instalar.
+    Editor de código integrado ao painel, com árvore de arquivos, realce de sintaxe, abas e **pré-visualização ao vivo**. Nada pra instalar.
   </Card>
+
   <Card title="Editor Local (CLI)" icon="terminal" href="/editor/editor-local">
-    Edite os arquivos na sua máquina com o VS Code (ou qualquer editor) via
-    `npx allbay-editor`. Sincronização automática com a loja.
+    Edite os arquivos na sua máquina com o VS Code (ou qualquer editor) via `npx allbay-editor`. Sincronização automática com a loja.
   </Card>
 </CardGroup>
 
 ## Editar com IA
 
-Com o [Editor Local](/editor/editor-local) você pode usar assistentes de IA pra
-gerar e ajustar componentes por linguagem natural:
+Com o [Editor Local](/editor/editor-local) você pode usar assistentes de IA pra gerar e ajustar componentes por linguagem natural:
 
 <CardGroup cols={2}>
-  <Card title="Claude Code" icon="robot" href="/editor/ia/claude" />
-  <Card title="Cursor" icon="wand-magic-sparkles" href="/editor/ia/cursor" />
+  <Card title="Claude Code" icon="robot" href="/editor/ia/claude">
+  </Card>
+
+  <Card title="Cursor" icon="wand-magic-sparkles" href="/editor/ia/cursor">
+  </Card>
 </CardGroup>
 
 <Note>
-  A AllBay usa Liquid **padrão** (`{% %}` e `{{ }}`), não uma variante própria de
-  delimitadores. Isso mantém o tooling (realce, formatadores, IA) funcionando sem
-  configuração especial. Ver [Sintaxe](/editor/sintaxe).
+  A AllBay usa Liquid **padrão** (`{% %}` e `{{ }}`). Isso mantém o tooling (realce, formatadores, IA) funcionando sem configuração especial. Ver [Sintaxe](/editor/sintaxe).
 </Note>
