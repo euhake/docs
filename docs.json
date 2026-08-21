@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "AllBay — Editor de Temas",
+  "name": "AllBay - Editor de Temas",
   "colors": {
     "primary": "#5865F2",
     "light": "#8B5CF6",
