@@ -1,0 +1,67 @@
+---
+title: "Claude Code"
+description: "Edite seu tema AllBay com o Claude Code, por linguagem natural."
+---
+
+O [Claude Code](https://claude.com/claude-code) é o agente de código da Anthropic
+(terminal ou extensão do VS Code). Com o [Editor Local](/editor/editor-local),
+você descreve o que quer e o Claude edita os arquivos do tema.
+
+## Pré-requisitos
+
+- Arquivos do tema baixados com o [Editor Local](/editor/editor-local)
+  (`npx allbay-editor --token ...`) rodando na pasta.
+- Claude Code instalado.
+
+## Passo a passo
+
+<Steps>
+  <Step title="Baixe o tema e deixe o CLI rodando">
+    ```bash
+    mkdir meu-tema && cd meu-tema
+    npx allbay-editor --token SEU_TOKEN_AQUI
+    ```
+    Deixe esse terminal aberto — ele sincroniza cada save.
+  </Step>
+  <Step title="Abra o Claude Code na pasta">
+    Em outro terminal, na mesma pasta, rode `claude` (ou abra a pasta pela
+    extensão do VS Code).
+  </Step>
+  <Step title="Peça a mudança">
+    Descreva em português:
+    > "Adicione um banner promocional verde no topo da home."
+
+    O Claude edita os `.liquid`/`.css`/`.js`. Ao salvar, o CLI sincroniza.
+  </Step>
+</Steps>
+
+## Dê contexto ao Claude (recomendado)
+
+Crie um arquivo **`CLAUDE.md`** na raiz do tema com as regras da plataforma —
+assim o Claude usa a sintaxe e os objetos certos:
+
+```md CLAUDE.md
+# Tema AllBay (Liquid)
+
+- Motor: **Liquid padrão** — `{% %}` para lógica, `{{ }}` para saída.
+- Componentes: `{% render 'components/nome' %}`. Dados: `{% load "products", limit: 8 %}`.
+- Objetos globais: `store`, `theme`, `config`, `user`, `categories`, `gateways`,
+  `socials`, `products`, `product`/`package`, `order`, `cart`.
+- Filtros úteis: `money`/`format_price`, `hex_to_hsl`, `cdn_url`, `slugify`, `stars`.
+- Preços com `| money`. Imagens de produto já vêm assinadas; `config`/`post` usam `| cdn_url`.
+- Login é da plataforma (não escreva `pages/login`).
+- Docs: https://docs.allbay.io/editor/introducao
+
+Faça UMA mudança por vez e confira no preview antes de seguir.
+```
+
+<Tip>
+  Referencie as páginas de [Sintaxe](/editor/sintaxe),
+  [Tags](/editor/tags), [Filtros](/editor/filtros) e
+  [Variáveis Globais](/editor/variaveis-globais) para o Claude acertar de primeira.
+</Tip>
+
+<Warning>
+  Faça mudanças pequenas e confira o preview a cada passo. Antes de mexidas
+  grandes, exporte o tema como backup pelo painel.
+</Warning>

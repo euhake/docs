@@ -1,0 +1,55 @@
+---
+title: "Páginas"
+description: "Cada rota da loja mapeia para um arquivo de página do tema."
+---
+
+Quando um visitante acessa uma URL, a AllBay identifica o tipo de página, carrega
+os dados relevantes e renderiza o arquivo correspondente, com as
+[variáveis globais](/editor/variaveis-globais) mais as variáveis específicas
+daquela página.
+
+## Mapa de rotas
+
+| Rota | Arquivo (Kopy) | Variáveis específicas |
+| --- | --- | --- |
+| `/` | `pages/index.liquid` | — (use `{% load %}`) |
+| `/products` · `/category/:slug` | `pages/category.liquid` | `category`, subcategorias, produtos (paginados) |
+| `/products/:slug` | `pages/package.liquid` | `package` (preço, estoque, variações, campos, descrição) |
+| `/search` | `pages/search.liquid` | resultados paginados por `query` |
+| `/checkout` | `pages/checkout.liquid` | carrinho + `discord.enabled/optional` |
+| `/order/:id` | `pages/order.liquid` | `order` (status, itens, entregas, variáveis, notas) |
+| `/payment/:id` | `pages/payment.liquid` | pagamento pendente (Pix: código + QR em base64) |
+| `/post/:slug` | `pages/post.liquid` | `post` (título, slug, conteúdo HTML, data) |
+| `/blog` | `pages/blog.liquid` | posts paginados |
+| `/account/orders` | `pages/account/orders.liquid` | histórico de pedidos (injetado no servidor) |
+| `/account/affiliate` | `pages/account/affiliate.liquid` | painel de afiliado |
+| `/terms` | `pages/terms.liquid` | termos (HTML) |
+| `/pages/:handle` | `pages/:handle.liquid` | página custom sua |
+| 404 | `pages/not-found.liquid` | — (soft-404, HTTP 200) |
+| manutenção | `pages/maintenance.liquid` | — (quando a loja está pausada) |
+
+<Note>
+  Os nomes seguem os [aliases de resolução](/editor/estrutura#resolução-de-páginas-aliases):
+  a rota de produto aceita `package` ou `product`, coleção aceita `category` ou
+  `collection`, checkout aceita `checkout` ou `cart`, 404 aceita `not-found` ou
+  `404`.
+</Note>
+
+## Login é sempre da plataforma
+
+A página `/login` **não** é renderizada pelo tema. A AllBay usa login por
+**OAuth2 interno**: ao acessar `/login` (ou qualquer rota que exija sessão sem
+estar logado), o visitante é redirecionado automaticamente para a tela de login
+da plataforma. Você não precisa (nem pode) escrever `pages/login.liquid`.
+
+<Info>
+  A **área do cliente** (`/account/*`), a de **pedido** (`/order/:id`) e a de
+  **pagamento** (`/payment/:id`) são renderizadas pelo tema (Liquid), mas exigem
+  sessão — sem login, o visitante cai no fluxo de OAuth2 acima.
+</Info>
+
+## Layouts
+
+A cadeia de layouts envolve a página. No Kopy, `layouts/layout.liquid` é o
+documento base (`<html>`, `<head>`, scripts/estilos globais) e a página entra no
+ponto de conteúdo. Ver [Estrutura](/editor/estrutura).

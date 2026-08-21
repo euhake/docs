@@ -1,0 +1,89 @@
+---
+title: "Estrutura de Arquivos"
+description: "Como um tema AllBay é organizado — pastas, arquivos e resolução de rotas."
+---
+
+Um tema é um conjunto de arquivos de texto versionados. A AllBay resolve cada
+rota da loja para um arquivo de página, envolve na cadeia de layouts e renderiza
+com Liquid.
+
+## Pastas
+
+Não há uma allowlist de pastas — você organiza como quiser (respeitando os
+[limites](#limites)). A convenção dos temas base:
+
+| Pasta | Conteúdo |
+| --- | --- |
+| `pages/` | Páginas principais (index, category, package, checkout, order…) |
+| `pages/account/` | Área do cliente (orders, affiliate) |
+| `layouts/` | Layouts que envolvem as páginas (ex: `layout.liquid`) |
+| `components/` | Elementos reutilizáveis (`{% render %}`) |
+| `styles/` | CSS |
+| `scripts/` | JavaScript |
+
+<Info>
+  O tema **Kopy** usa exatamente essa estrutura: `components/`, `layouts/layout.liquid`,
+  `pages/` (com `pages/account/`), `scripts/`, `styles/core.css` e um
+  `tailwind.config.json` na raiz.
+</Info>
+
+## Tipos de arquivo
+
+São aceitas estas extensões:
+
+```
+.html  .liquid  .css  .js  .mjs  .jsx  .ts  .tsx  .json  .svg  .txt  .md
+```
+
+Páginas, layouts e componentes são Liquid — use `.liquid` (o `.html` também é
+aceito). Binários (imagens, fontes) **não** ficam no tema: imagens entram pelo
+campo `image` do [schema](/editor/schema) e são servidas pelo CDN.
+
+## Limites
+
+| Limite | Valor |
+| --- | --- |
+| Arquivos por tema | **100** (no total, não por pasta) |
+| Tamanho total do tema | **5 MiB** |
+| Profundidade de caminho | **8** níveis |
+| Caracteres no nome | sem **espaços** (use `-` ou `_`); apenas ASCII visível |
+| Temas editáveis por loja | 10 |
+
+<Warning>
+  Nomes de arquivo **não podem ter espaços** nem caracteres não-ASCII. `dotfiles`
+  (`.env`, `.git/…`) são rejeitados em qualquer nível do caminho.
+</Warning>
+
+## Componentes
+
+Inclua um componente com `{% render %}`. Um nome simples (sem barra) procura em
+`components/` e `snippets/`:
+
+```liquid
+{% render 'components/navbar' %}
+{% render 'navbar' %}          {# procura components/navbar e snippets/navbar #}
+```
+
+## Layouts
+
+Um layout envolve a página. A página declara o layout e o layout imprime o
+conteúdo. Ver a cadeia de layouts em [Páginas](/editor/paginas).
+
+## Resolução de páginas (aliases)
+
+Cada rota resolve para um arquivo de entrada — mas você não precisa nomear tudo
+exatamente igual. A AllBay tenta, em ordem:
+
+1. **Extensões:** `.liquid`, `.html`, `.json` e sem extensão.
+2. **Aliases de nome:** `product ≡ package`, `collection ≡ category`,
+   `cart ≡ checkout`, `404 ≡ not-found`.
+3. **Fallback de pasta:** `templates/` → `pages/`.
+
+Por isso o Kopy (que só tem `pages/`, sem `templates/`) atende a rota de produto
+com `pages/package.liquid`, a de coleção com `pages/category.liquid`, e assim por
+diante. Ver a tabela completa em [Páginas](/editor/paginas).
+
+## Configuração (schema)
+
+Um arquivo de schema define as opções que aparecem no painel **Personalizar
+template** (cores, textos, imagens…). Ver [Schema](/editor/schema).

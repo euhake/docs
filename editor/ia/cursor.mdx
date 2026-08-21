@@ -1,0 +1,60 @@
+---
+title: "Cursor"
+description: "Edite seu tema AllBay com o Cursor, por linguagem natural."
+---
+
+O [Cursor](https://cursor.com) é um editor de código com IA integrada (baseado no
+VS Code). Com o [Editor Local](/editor/editor-local), você descreve as mudanças e
+o Cursor edita os arquivos do tema.
+
+## Pré-requisitos
+
+- Arquivos do tema baixados com o [Editor Local](/editor/editor-local)
+  (`npx allbay-editor --token ...`) rodando na pasta.
+- Cursor instalado.
+
+## Passo a passo
+
+<Steps>
+  <Step title="Baixe o tema e deixe o CLI rodando">
+    ```bash
+    mkdir meu-tema && cd meu-tema
+    npx allbay-editor --token SEU_TOKEN_AQUI
+    ```
+    Deixe esse terminal aberto — ele sincroniza cada save.
+  </Step>
+  <Step title="Abra a pasta no Cursor">
+    Use o chat (`Ctrl/Cmd + L`) ou a edição inline (`Ctrl/Cmd + K`).
+  </Step>
+  <Step title="Peça a mudança">
+    > "Deixe o cabeçalho fixo no topo ao rolar a página."
+
+    O Cursor edita os arquivos; aceite as sugestões e salve — o CLI sincroniza.
+    Para mudanças em vários arquivos, use o chat com `@Codebase`.
+  </Step>
+</Steps>
+
+## Dê contexto ao Cursor (recomendado)
+
+Crie um arquivo **`.cursorrules`** na raiz do tema:
+
+```md .cursorrules
+Este projeto é um tema AllBay em Liquid PADRÃO.
+- Lógica: {% %}. Saída: {{ }}. Componentes: {% render 'components/nome' %}.
+- Dados: {% load "products", limit: 8 %}. Objetos: store, theme, config, user,
+  categories, gateways, socials, products, product/package, order, cart.
+- Filtros: money/format_price, hex_to_hsl, cdn_url, slugify, stars.
+- Preços com | money. Login é da plataforma (não crie pages/login).
+- Docs: https://docs.allbay.io/editor/introducao
+Faça uma mudança por vez.
+```
+
+<Tip>
+  Referencie [Sintaxe](/editor/sintaxe), [Tags](/editor/tags),
+  [Filtros](/editor/filtros) e [Variáveis Globais](/editor/variaveis-globais).
+</Tip>
+
+<Warning>
+  Faça mudanças pequenas e confira o preview. Antes de mexidas grandes, exporte o
+  tema como backup pelo painel.
+</Warning>

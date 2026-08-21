@@ -1,0 +1,138 @@
+---
+title: "Variáveis Globais"
+description: "Objetos disponíveis em todas as páginas do tema."
+---
+
+Estas variáveis estão disponíveis em **todas** as páginas. Cada página também
+recebe variáveis próprias (ver [Páginas](/editor/paginas)).
+
+## `store` — a loja
+
+```liquid
+{{ store.name }} · {{ store.currency }}
+```
+
+| Campo | Tipo | Descrição |
+| --- | --- | --- |
+| `name` | string | Nome da loja |
+| `currency` | string | Moeda (BRL, USD, EUR) |
+| `subdomain` | string? | Subdomínio |
+| `custom_domain` | string? | Domínio próprio (se verificado) |
+| `type` | string | Tipo da loja (`STANDALONE`, …) |
+| `maintenance` | bool | Em manutenção |
+| `auth` / `show_login` | bool | Login habilitado |
+| `require_document` | bool | Exige documento no checkout |
+| `require_address` | bool | Exige endereço |
+| `require_discord` | bool | Exige Discord |
+| `phone_mode` | string | `DISABLED` / `OPTIONAL` / `REQUIRED` |
+| `theme` | objeto | O mesmo objeto de [`theme`](#theme) |
+
+<Note>
+  Existe também um objeto `shop` (identidade nativa: `name`, `slug`, `id`,
+  `logo_url`, `banner_url`). Para paridade com temas Liquid do mercado, **use
+  `store`**.
+</Note>
+
+## `theme` — aparência
+
+| Campo | Tipo |
+| --- | --- |
+| `primary_color`, `secondary_color`, `accent_color`, `buttons_color` | `#rrggbb` |
+| `theme_mode` | `light` / `dark` |
+| `logo`, `banner`, `favicon` | string (URL assinada do CDN) |
+| `description` | string |
+| `background_image`, `hero_image` | string |
+| `floating_categories`, `show_search`, `show_sales` | bool |
+
+## `config` e `settings`
+
+`config` é o objeto que o [schema](/editor/schema) preenche (paleta + seções +
+valores do dono). A chave converte hífens em underscores (`primary-color` →
+`config.primary_color`). `settings` é o objeto cru dos valores do dono.
+
+```liquid
+<style>:root{ --primary: {{ config.primary_color | hex_to_hsl }}; }</style>
+{{ config.headline }}
+```
+
+## `user`, `customer`, `logged_in`
+
+| Global | Tipo | Descrição |
+| --- | --- | --- |
+| `logged_in` | bool | Cliente autenticado? |
+| `user` | objeto? | `name`, `email`, `avatar`, `discord_id` (null se deslogado) |
+| `customer` | objeto? | `id`, `name`, `avatar_url`, `initial`, `email`, `discord_id` |
+
+```liquid
+{% if logged_in %}Olá, {{ user.name }}{% else %}<a href="/login">Entrar</a>{% endif %}
+```
+
+## `categories` e `category`
+
+Array de categorias (`categories`) e a categoria atual na página de coleção
+(`category`). Campos: `name`, `slug`, `emoji`, `image`, `banner`,
+`product_count`, `sub_categories[]`, `products[]`.
+
+## `products`, `packages`, `product`
+
+- `products` — **array** de produtos (cards).
+- `packages` — **envelope** `{ data: [...], size, total }` (não é array direto).
+- `product` / `package` — o produto da página de produto (mesmo objeto).
+
+Campos principais do produto:
+
+| Campo | Tipo |
+| --- | --- |
+| `name`, `slug`, `id` | string |
+| `description`, `short_description` | string |
+| `price`, `comparison_price` | número |
+| `pricing` | `{ price, min, compare_at, percent_discount }` |
+| `stock` | `{ quantity, available, min_amount }` |
+| `image`, `banner`, `gallery[]`, `images[]` | string / array |
+| `variants[]`, `default_variant`, `has_variants` | variações |
+| `variables[]` (alias `fields[]`) | campos de checkout do produto |
+| `feedback_stats` | `{ average, total }` |
+| `sales_count`, `auto_deliver` | int / bool |
+
+## `socials` e `gateways`
+
+- `socials` — sempre traz todas as redes (null quando não configurada):
+  `instagram`, `discord`, `youtube`, `twitter`, `facebook`, `tiktok`,
+  `whatsapp`, `telegram`.
+- `gateways` — array de métodos de pagamento: `{ name (ex: "PIX"), display, fee,
+  is_percentage_fee, provider, max_installments, … }`.
+
+```liquid
+{% assign pix = gateways | where: "name", "PIX" | first %}
+```
+
+## `order`, `posts`, `post`, `cart`
+
+- `order` — na página de pedido/pagamento: `status`, `price`, `price_display`,
+  `pix_code`, `qr_code` (data-URI), `gateway`, `packages[]`, `deliveries[]`,
+  `variables[]`, `client_name`, `access_token`.
+- `posts` — índice do blog: `{ data:[…], meta:{ total, per_page, current_page,
+  last_page, … } }`. `post` — o post (`title`, `slug`, `content`, `image`,
+  `published_at`).
+- `cart` — `{ items, items_count, total }` (vazio no servidor; o SDK hidrata no
+  cliente).
+
+## Requisição
+
+- `query` — parâmetros da URL (`query.page`, `query.bar`, …).
+- `pathname` — o caminho atual (sem query).
+
+## Scripts e estilos da plataforma
+
+Injete o SDK e o CSS base da AllBay:
+
+```liquid
+<script src="{{ allbay_script }}"></script>
+```
+
+<Warning>
+  Use **`allbay_script`** / **`allbay_style`** (não `centralcart_script`). E o
+  bloco de dados do negócio (`store.business` — CNPJ, e-mail, horários) ainda não
+  é exposto ao tema; proteja com `{% if store.business != blank %}` até estar
+  disponível.
+</Warning>

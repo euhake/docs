@@ -1,0 +1,104 @@
+---
+title: "Schema"
+description: "Defina opções editáveis no painel — sem tocar no código do tema."
+---
+
+O schema define as opções de personalização que aparecem no painel **Personalizar
+template**. Assim o dono da loja ajusta cores, textos e imagens sem editar código.
+
+O arquivo é `config/settings_schema.json`.
+
+## Estrutura
+
+```json
+{
+  "name": "Meu Tema",
+  "author": "Você",
+  "version": "1.0.0",
+  "settings": [
+    {
+      "title": "Cores",
+      "fields": [
+        {
+          "key": "primary-color",
+          "label": "Cor primária",
+          "description": "Cor principal da loja",
+          "type": "color",
+          "default": "#5865F2"
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Acessando os valores
+
+Os valores ficam no global `config`. A chave converte hífens em underscores:
+
+| Chave no schema | Acesso no Liquid |
+| --- | --- |
+| `primary-color` | `config.primary_color` |
+| `hero-image` | `config.hero_image` |
+
+```liquid
+<style>:root{ --primary: {{ config.primary_color | hex_to_hsl }}; }</style>
+<img src="{{ config.hero_image | cdn_url: 'settings' }}" />
+```
+
+## Tipos de campo
+
+| Tipo | Guarda | Observação |
+| --- | --- | --- |
+| `text` | texto de uma linha | |
+| `textarea` | texto multilinha | |
+| `wysiwyg` | HTML (editor rico) | |
+| `color` (`color-picker`) | cor hex | |
+| `number` (`range`) | número | aceita `min`/`max` |
+| `checkbox` (`boolean`) | verdadeiro/falso | |
+| `select` | uma opção | requer `options` |
+| `url` | URL validada | |
+| `image` (`image_picker`) | imagem | guarda o hash → serve pelo CDN |
+| `images` | várias imagens | aceita `max_items` |
+| `array` | lista de itens | itens com `fields` aninhados |
+| `products` (`packages`) | seleção de produtos | referências; aceita `max_items` |
+
+<Info>
+  As imagens do tema entram por campos `image`/`images` do schema (não como
+  arquivos no tema) e são servidas pelo CDN — por isso o repositório do tema é
+  só texto.
+</Info>
+
+## Exemplo com vários campos
+
+```json
+{
+  "name": "Meu Tema",
+  "version": "1.0.0",
+  "settings": [
+    {
+      "title": "Cabeçalho",
+      "fields": [
+        { "key": "logo", "label": "Logo", "type": "image" },
+        { "key": "fixed-header", "label": "Cabeçalho fixo", "type": "checkbox", "default": true },
+        {
+          "key": "layout", "label": "Layout", "type": "select",
+          "options": [{ "value": "wide", "label": "Largo" }, { "value": "boxed", "label": "Caixa" }],
+          "default": "wide"
+        }
+      ]
+    },
+    {
+      "title": "Destaques",
+      "fields": [
+        { "key": "featured", "label": "Produtos em destaque", "type": "products", "max_items": 4 }
+      ]
+    }
+  ]
+}
+```
+
+<Note>
+  A validação é por tipo: um campo `color` só aceita hex, `select` só aceita as
+  `options`, `number` respeita `min`/`max`. Valor inválido é recusado no servidor.
+</Note>

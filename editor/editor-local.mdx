@@ -1,0 +1,82 @@
+---
+title: "Editor Local (CLI)"
+description: "Edite o tema na sua máquina com o VS Code — sincronização automática."
+---
+
+Prefere editar na sua máquina, com o VS Code (ou qualquer editor) e as suas
+ferramentas? O **editor local** baixa os arquivos do tema para uma pasta e
+sincroniza cada alteração com a loja automaticamente.
+
+```bash
+npx allbay-editor --token SEU_TOKEN_AQUI
+```
+
+## Pré-requisitos
+
+- **Node.js 18+**.
+- Um editor de código (VS Code recomendado).
+
+## Passo a passo
+
+<Steps>
+  <Step title="Gere o token de sessão local">
+    No painel, vá em **Aparência → Template**, clique no menu **⋮** ao lado do
+    seu tema e escolha **Iniciar sessão local**. Copie o token gerado.
+
+    <Note>O token vale por **7 dias**. Depois, gere um novo.</Note>
+  </Step>
+  <Step title="Crie uma pasta e rode o CLI">
+    ```bash
+    mkdir meu-tema && cd meu-tema
+    npx allbay-editor --token SEU_TOKEN_AQUI
+    ```
+    O CLI baixa todos os arquivos do tema para a pasta.
+  </Step>
+  <Step title="Edite e salve">
+    Abra a pasta no seu editor. **Cada arquivo que você salvar é sincronizado
+    automaticamente** com a loja, como rascunho.
+  </Step>
+  <Step title="Publique">
+    Quando estiver pronto, **publique** e **ative** o tema pelo painel (ou pelo
+    editor web).
+  </Step>
+</Steps>
+
+## Como funciona a sincronização
+
+- O CLI **baixa** todos os arquivos ao iniciar.
+- Enquanto roda, **observa** a pasta: a cada save, ele envia o tema como
+  **rascunho** para a loja.
+- Usa **controle de concorrência** (o commit atual do servidor): se o tema mudou
+  no servidor (ex: você editou pelo painel web em outra aba), o CLI rebaixa e
+  reenvia — sem sobrescrever cegamente.
+
+## Opções
+
+| Opção | Descrição |
+| --- | --- |
+| `--token`, `-t` | Token de sessão local (também aceita `ALLBAY_TOKEN`) |
+| `--dir`, `-d` | Pasta local do tema (padrão: pasta atual) |
+| `--pull` | Só baixa os arquivos e sai (não observa) |
+| `--help`, `-h` | Ajuda |
+
+## Limites
+
+- Até **100 arquivos** por tema, **5 MiB** no total.
+- Extensões: `.html .liquid .css .js .mjs .jsx .ts .tsx .json .svg .txt .md`.
+- Sem **espaços** nos nomes de arquivo.
+
+<Warning>
+  O token dá acesso de edição ao seu tema — trate como senha. Não cole em lugares
+  públicos. Se vazar, encerre a sessão pelo painel (ou troque a senha, que revoga
+  as sessões).
+</Warning>
+
+## Editar com IA
+
+Com os arquivos na sua máquina, você pode usar assistentes de IA:
+
+<CardGroup cols={2}>
+  <Card title="Claude Code" icon="robot" href="/editor/ia/claude" />
+  <Card title="Cursor" icon="wand-magic-sparkles" href="/editor/ia/cursor" />
+</CardGroup>
