@@ -147,9 +147,7 @@ paginação no servidor.
 
 - `socials` — todas as redes, `null` quando não configurada: `instagram`, `discord`,
   `youtube`, `twitter`, `facebook`, `tiktok`, `whatsapp`, `telegram`.
-- `gateways` — métodos de pagamento **disponíveis agora** na loja:
-  `{ name ("PIX" ou "CREDITCARD"), display, method, provider, fee, fee_percent, fee_fixed,
-  is_percentage_fee, require_document, require_address, require_phone, max_installments }`.
+- `gateways` — métodos de pagamento **disponíveis agora** na loja. Campos: `name` (`PIX` ou `CREDITCARD`), `display`, `method`, `provider`, `fee`, `fee_percent`, `fee_fixed`, `is_percentage_fee`, `require_document`, `require_address`, `require_phone`, `max_installments`.
 
 ```liquid
 {% assign pix = gateways | where: "name", "PIX" | first %}
@@ -173,8 +171,7 @@ paginação no servidor.
 `qr_code` (imagem SVG em data-URI), `packages[]`, `deliveries[]`, `client_name`,
 `client_email`, `promo_code`, `created_at`, `access_token`.
 
-**`posts`:** `{ data: [...], meta: { total, per_page, current_page, last_page, first_page,
-next_page_url, previous_page_url } }`. **`post`:** `title`, `slug`, `content` (HTML),
+**`posts`:** `{ data, meta }`, com `meta` = `total`, `per_page`, `current_page`, `last_page`, `first_page`, `next_page_url`, `previous_page_url`. **`post`:** `title`, `slug`, `content` (HTML),
 `image`, `excerpt`, `author`, `reading_time`, `published_at` (data por extenso, pt-BR) e
 `published_at_iso`.
 
