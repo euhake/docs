@@ -9,7 +9,7 @@ relevantes e renderiza o arquivo correspondente, com as
 
 ## Mapa de rotas
 
-| Rota | Arquivo (Kopy) | Variáveis específicas |
+| Rota | Arquivo (Vega) | Variáveis específicas |
 | --- | --- | --- |
 | `/` | `pages/index.liquid` | `products`/`packages` (até 100), `sections`, `showcase`, `recent_feedbacks` |
 | `/products` | `pages/category.liquid` | todos os produtos (até 100), sem `category` |
@@ -21,7 +21,7 @@ relevantes e renderiza o arquivo correspondente, com as
 | `/payment/:id` | `pages/payment.liquid` | `order` (PIX: `pix_code` + `qr_code`) |
 | `/blog` | `pages/blog.liquid` | `posts` (página 1, 20 posts) |
 | `/post/:slug` | `pages/post.liquid` | `post` |
-| `/account` | `pages/account.liquid` (o Kopy não tem — cai no 404) | `orders` |
+| `/account` | `pages/account.liquid` (o Vega não tem — cai no 404) | `orders` |
 | `/account/orders` | `pages/account/orders.liquid` (ou `pages/account`) | `orders` (`{ data, meta }`, 20 por página, `?page=`) |
 | `/account/affiliate` | `pages/account/affiliate.liquid` (ou `pages/account`) | `orders` |
 | `/terms` | `pages/terms.liquid` | `terms` (HTML) |
@@ -100,7 +100,7 @@ Há duas formas de envolver as páginas:
 - **Layout automático:** crie `layouts/base.liquid` com `{{ content_for_layout }}` onde a página
   deve entrar. Toda página é renderizada dentro dele.
 - **Layout declarado:** a página começa com `{% layout 'layouts/layout' %}` e o conteúdo dela
-  entra no `{% block %}{% endblock %}` do layout — é o que o Kopy usa. Ver [Tags](/editor/tags#layout-e-block).
+  entra no `{% block %}{% endblock %}` do layout — é o que o Vega usa. Ver [Tags](/editor/tags#layout-e-block).
 
 <Warning>
   Se **alguma** página do tema usa `{% layout %}`, toda página que **não** declarar um layout é

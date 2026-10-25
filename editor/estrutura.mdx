@@ -25,7 +25,7 @@ Arquivos novos só podem ser criados nestas pastas (diretamente dentro delas):
 Arquivos que vieram com o tema base podem estar em outros lugares e continuam valendo.
 
 <Info>
-  O tema **Kopy** usa: `components/`, `layouts/layout.liquid`, `pages/` (com
+  O tema **Vega** usa: `components/`, `layouts/layout.liquid`, `pages/` (com
   `pages/account/`), `scripts/`, `styles/core.css` e um `tailwind.config.json` na raiz.
 </Info>
 
@@ -94,7 +94,7 @@ Duas formas de envolver as páginas — ver [Páginas](/editor/paginas#layouts):
 - **Automática:** se existir `layouts/base.liquid`, toda página é renderizada dentro
   dele, no lugar de `{{ content_for_layout }}`.
 - **Declarada:** a página começa com `{% layout 'layouts/layout' %}` e o conteúdo dela entra
-  no `{% block %}{% endblock %}` do layout (é o que o Kopy usa).
+  no `{% block %}{% endblock %}` do layout (é o que o Vega usa).
 
 ## Resolução de páginas (aliases)
 
@@ -109,7 +109,7 @@ exatamente igual. A AllBay tenta, em ordem:
 Aliases de nome: `product ≡ package`, `collection ≡ category`,
 `cart ≡ checkout`, `404 ≡ not-found`. O nome canônico sempre vence o alias.
 
-Por isso o Kopy (que só tem `pages/`) atende a rota de produto com
+Por isso o Vega (que só tem `pages/`) atende a rota de produto com
 `pages/package.liquid` e a de coleção com `pages/category.liquid`. Ver a tabela
 completa em [Páginas](/editor/paginas).
 
