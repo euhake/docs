@@ -9,12 +9,13 @@ O editor de temas da AllBay permite personalizar por completo a aparência e o c
 
 - Editar **HTML, CSS e JavaScript** de todas as páginas da loja.
 - Criar **componentes** reutilizáveis e **layouts** personalizados.
-- Usar **variáveis dinâmicas** (dados da loja, categorias, produtos, pedidos).
+- Usar **variáveis dinâmicas** (dados da loja, categorias, produtos, pedidos, termos).
+- Carregar dados sob demanda com a tag [`{% load %}`](/editor/tags#load-dados-dinâmicos).
 - Definir opções visuais via **schema**, editáveis no painel sem tocar em código.
 
 ## Temas base
 
-A galeria traz temas prontos que você pode **usar direto (linked)** ou **personalizar (fork)**:
+Toda loja nova já nasce com o tema **Kopy** ativo. A galeria traz estes temas prontos, que você pode **usar direto (linked)** ou **personalizar (fork)**:
 
 <CardGroup cols={3}>
   <Card title="Source">
@@ -37,28 +38,39 @@ A galeria traz temas prontos que você pode **usar direto (linked)** ou **person
 </CardGroup>
 
 <Info>
-  **Linked** aponta para o tema da galeria e **atualiza sozinho** quando o tema base é atualizado. **Fork** é uma cópia editável e independente. Ver [Estrutura](/editor/estrutura).
+  **Linked** aponta para o tema da galeria e **acompanha as atualizações** do tema base. **Fork** é uma cópia editável e independente — deixa de receber as atualizações da galeria. Ver [Estrutura](/editor/estrutura).
 </Info>
 
-## Como criar um tema
+<Note>
+  **Personalizar o código** (criar fork ou tema em branco, salvar, publicar e restaurar versões) é uma vantagem do **nível da loja** (template próprio). Usar um tema da galeria como linked está disponível para todas as lojas.
+</Note>
+
+## Como trocar ou personalizar o tema
 
 <Steps>
   <Step title="Abra o painel">
-    Vá em **Aparência → Template** no painel da sua loja.
+    Vá em **Aparência** no painel da sua loja e abra **Template**.
   </Step>
   <Step title="Escolha um tema">
-    Selecione um tema da galeria (fica **linked** por padrão) ou clique em **Personalizar código** para forkar uma cópia editável.
+    Selecione um tema da galeria (fica **linked**) ou clique em **Personalizar código** para criar um fork editável.
   </Step>
-  <Step title="Ative">
-    **Ativar** coloca o tema no ar. Uma loja nova nasce em modo Liquid sem tema — é só escolher um.
+  <Step title="Edite e publique">
+    As edições ficam em **rascunho**. **Publicar** grava uma versão; publicar exige a página inicial (`templates/index` ou `pages/index`).
+  </Step>
+  <Step title="Aplique na loja">
+    **Aplicar à loja** (no painel) ou **Ativar** (no Studio) coloca a versão publicada no ar.
   </Step>
 </Steps>
+
+<Tip>
+  Cada publicação fica no **histórico** (até 50 versões) e pode ser **restaurada**. Pelo menu do template você também pode **baixar** o tema em `.zip` e **importar** um `.zip`.
+</Tip>
 
 ## Formas de editar
 
 <CardGroup cols={2}>
   <Card title="Editor Web (Studio)" icon="window">
-    Editor de código integrado ao painel, com árvore de arquivos, realce de sintaxe, abas e **pré-visualização ao vivo**. Nada pra instalar.
+    Editor de código integrado ao painel, com árvore de arquivos, realce de sintaxe, abas, busca e **pré-visualização ao vivo**. Nada pra instalar.
   </Card>
 
   <Card title="Editor Local (CLI)" icon="terminal" href="/editor/editor-local">
@@ -68,7 +80,7 @@ A galeria traz temas prontos que você pode **usar direto (linked)** ou **person
 
 ## Editar com IA
 
-Com o [Editor Local](/editor/editor-local) você pode usar assistentes de IA pra gerar e ajustar componentes por linguagem natural:
+Com o [Editor Local](/editor/editor-local) você pode usar assistentes de IA pra gerar e ajustar componentes por linguagem natural. Conecte a IA ao **MCP desta documentação** (`https://allbay.mintlify.app/mcp`) para ela consultar as regras da AllBay sozinha — o passo a passo está em cada página:
 
 <CardGroup cols={2}>
   <Card title="Claude Code" icon="robot" href="/editor/ia/claude">
@@ -79,5 +91,5 @@ Com o [Editor Local](/editor/editor-local) você pode usar assistentes de IA pra
 </CardGroup>
 
 <Note>
-  A AllBay usa Liquid **padrão** (`{% %}` e `{{ }}`). Isso mantém o tooling (realce, formatadores, IA) funcionando sem configuração especial. Ver [Sintaxe](/editor/sintaxe).
+  A AllBay usa a sintaxe Liquid de sempre (`{% %}` e `{{ }}`), o que mantém o tooling (realce, formatadores, IA) funcionando sem configuração especial. Há algumas diferenças de comportamento — ver [Sintaxe](/editor/sintaxe).
 </Note>

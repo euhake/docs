@@ -3,14 +3,12 @@ title: "Cursor"
 description: "Edite seu tema AllBay com o Cursor, por linguagem natural."
 ---
 
-O [Cursor](https://cursor.com) é um editor de código com IA integrada (baseado no
-VS Code). Com o [Editor Local](/editor/editor-local), você descreve as mudanças e
-o Cursor edita os arquivos do tema.
+O [Cursor](https://cursor.com) é um editor de código com IA integrada (baseado no VS Code). Com o
+[Editor Local](/editor/editor-local), você descreve as mudanças e o Cursor edita os arquivos do tema.
 
 ## Pré-requisitos
 
-- Arquivos do tema baixados com o [Editor Local](/editor/editor-local)
-  (`npx allbay-editor --token ...`) rodando na pasta.
+- O [Editor Local](/editor/editor-local) com login feito e rodando na pasta do tema.
 - Cursor instalado.
 
 ## Passo a passo
@@ -19,7 +17,7 @@ o Cursor edita os arquivos do tema.
   <Step title="Baixe o tema e deixe o CLI rodando">
     ```bash
     mkdir meu-tema && cd meu-tema
-    npx allbay-editor --token SEU_TOKEN_AQUI
+    npx allbay-editor@latest --template SEU_ID_DO_TEMPLATE
     ```
     Deixe esse terminal aberto — ele sincroniza cada save.
   </Step>
@@ -34,27 +32,59 @@ o Cursor edita os arquivos do tema.
   </Step>
 </Steps>
 
+## Conecte a documentação ao Cursor (MCP)
+
+Esta documentação tem um servidor **MCP**: com ele, o Cursor consulta as páginas da AllBay
+enquanto trabalha. Crie o arquivo **`.cursor/mcp.json`** na raiz do tema (ele fica só na sua
+máquina):
+
+```json .cursor/mcp.json
+{
+  "mcpServers": {
+    "allbay-docs": {
+      "url": "https://allbay.mintlify.app/mcp"
+    }
+  }
+}
+```
+
+Depois, confira em **Settings → MCP** que o `allbay-docs` aparece ativo. O servidor oferece
+busca na documentação e leitura das páginas.
+
+<Tip>
+  Para outras IAs, a documentação inteira também está em texto em
+  [llms.txt](https://allbay.mintlify.app/llms.txt) (índice) e
+  [llms-full.txt](https://allbay.mintlify.app/llms-full.txt) (conteúdo completo).
+</Tip>
+
 ## Dê contexto ao Cursor (recomendado)
 
-Crie um arquivo **`.cursorrules`** na raiz do tema:
+Crie um arquivo **`.cursorrules`** na raiz do tema (ele fica só na sua máquina):
 
 ```md .cursorrules
-Este projeto é um tema AllBay em Liquid PADRÃO.
-- Lógica: {% %}. Saída: {{ }}. Componentes: {% render 'components/nome' %}.
-- Dados: {% load "products", limit: 8 %}. Objetos: store, theme, config, user,
-  categories, gateways, socials, products, product/package, order, cart.
-- Filtros: money/format_price, hex_to_hsl, cdn_url, slugify, stars.
-- Preços com | money. Login é da plataforma (não crie pages/login).
-- Docs: https://docs.allbay.io/editor/introducao
+Este projeto é um tema AllBay em Liquid.
+- Lógica {% %}, saída {{ }}. Componentes: {% render 'components/nome', var: valor %}
+  (componentes só veem globais e parâmetros).
+- Falsos: nil, false, 0 e "". Lista vazia [] é verdadeira — use lista.size > 0.
+- Dados: {% load "packages", limit: 8 %}. Alias logo após a entidade:
+  {% load "product" as p, slug: "x" %}. Ids sempre entre aspas.
+- Objetos: store, theme, config, settings, user, logged_in, categories, products, packages,
+  product, gateways, socials, order, orders, posts, post, cart, terms, query, pathname.
+- Preços com | money. Imagens já vêm como URL pronta (teste antes de usar);
+  cdn_url só para hash de load "products"/"product"/"categories", com 4 argumentos.
+- Schema: chaves só com letras, números e _ (sem hífen).
+- Arquivos novos: só .liquid/.html/.css/.js, nomes em minúsculas até 32 caracteres.
+- Login é da plataforma (não crie pages/login).
+- Docs: https://allbay.mintlify.app/editor/introducao (MCP: https://allbay.mintlify.app/mcp)
 Faça uma mudança por vez.
 ```
 
 <Tip>
-  Referencie [Sintaxe](/editor/sintaxe), [Tags](/editor/tags),
-  [Filtros](/editor/filtros) e [Variáveis Globais](/editor/variaveis-globais).
+  Referencie [Sintaxe](/editor/sintaxe), [Tags](/editor/tags), [Filtros](/editor/filtros),
+  [Imagens](/editor/imagens) e [Variáveis Globais](/editor/variaveis-globais).
 </Tip>
 
 <Warning>
-  Faça mudanças pequenas e confira o preview. Antes de mexidas grandes, exporte o
-  tema como backup pelo painel.
+  Faça mudanças pequenas e confira o preview. Antes de mexidas grandes, baixe o tema em `.zip`
+  pelo painel como backup.
 </Warning>

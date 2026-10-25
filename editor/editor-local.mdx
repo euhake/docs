@@ -3,59 +3,73 @@ title: "Editor Local (CLI)"
 description: "Edite o tema na sua máquina com o VS Code — sincronização automática."
 ---
 
-Prefere editar na sua máquina, com o VS Code (ou qualquer editor) e as suas
-ferramentas? O **editor local** baixa os arquivos do tema para uma pasta e
-sincroniza cada alteração com a loja automaticamente.
+Prefere editar na sua máquina, com o VS Code (ou qualquer editor) e as suas ferramentas? O
+**editor local** baixa os arquivos do tema para uma pasta e sincroniza cada alteração com a
+loja automaticamente.
 
 ```bash
-npx allbay-editor --token SEU_TOKEN_AQUI
+npx allbay-editor@latest login
+npx allbay-editor@latest --template SEU_ID_DO_TEMPLATE
 ```
 
 ## Pré-requisitos
 
 - **Node.js 18+**.
 - Um editor de código (VS Code recomendado).
+- A loja precisa ter a vantagem de **template próprio** no nível dela (é ela que libera editar código).
 
 ## Passo a passo
 
 <Steps>
-  <Step title="Gere o token de sessão local">
-    No painel, vá em **Aparência → Template**, clique no menu **⋮** ao lado do
-    seu tema e escolha **Iniciar sessão local**. Copie o token gerado.
-
-    <Note>O token vale por **7 dias**. Depois, gere um novo.</Note>
+  <Step title="Pegue o ID do template">
+    No painel, vá em **Aparência → Template**, abra o menu **⋮** do seu tema e escolha
+    **Editar no seu computador** (no Studio: botão **Sessão local**). Copie o **ID do template**.
   </Step>
-  <Step title="Crie uma pasta e rode o CLI">
+  <Step title="Faça login (uma vez)">
+    ```bash
+    npx allbay-editor@latest login
+    ```
+    O navegador abre para você autorizar. A sessão fica salva no seu computador e é renovada
+    sozinha.
+  </Step>
+  <Step title="Baixe e edite">
     ```bash
     mkdir meu-tema && cd meu-tema
-    npx allbay-editor --token SEU_TOKEN_AQUI
+    npx allbay-editor@latest --template SEU_ID_DO_TEMPLATE
     ```
-    O CLI baixa todos os arquivos do tema para a pasta.
-  </Step>
-  <Step title="Edite e salve">
-    Abra a pasta no seu editor. **Cada arquivo que você salvar é sincronizado
-    automaticamente** com a loja, como rascunho.
+    O CLI baixa todos os arquivos do tema para a pasta. Abra a pasta no seu editor:
+    **cada arquivo salvo é sincronizado** com a loja, como rascunho.
   </Step>
   <Step title="Publique">
-    Quando estiver pronto, **publique** e **ative** o tema pelo painel (ou pelo
-    editor web).
+    Quando estiver pronto, publique pelo painel/Studio ou pelo próprio CLI:
+    ```bash
+    npx allbay-editor@latest publish --template SEU_ID_DO_TEMPLATE
+    ```
+    O comando publica o rascunho e coloca o tema no ar.
   </Step>
 </Steps>
 
 ## Como funciona a sincronização
 
-- O CLI **baixa** todos os arquivos ao iniciar.
-- Enquanto roda, **observa** a pasta: a cada save, ele envia o tema como
-  **rascunho** para a loja.
-- Usa **controle de concorrência** (o commit atual do servidor): se o tema mudou
-  no servidor (ex: você editou pelo painel web em outra aba), o CLI rebaixa e
-  reenvia — sem sobrescrever cegamente.
+- O CLI **baixa** todos os arquivos ao iniciar (arquivos locais com o mesmo nome são substituídos).
+- Enquanto roda, **observa** a pasta: a cada save, envia o tema inteiro como **rascunho**.
+- Só envia arquivos `.html`, `.liquid`, `.css`, `.js` e `.json`. Arquivos começando com `.`,
+  `node_modules` e outros tipos ficam só na sua máquina.
+- **Apagar** um arquivo da pasta apaga do tema no próximo envio.
 
-## Opções
+<Warning>
+  Não edite o mesmo tema no painel e no editor local ao mesmo tempo: a cópia da sua pasta
+  **substitui** o que foi alterado no painel.
+</Warning>
 
-| Opção | Descrição |
+## Comandos e opções
+
+| Comando / opção | Descrição |
 | --- | --- |
-| `--token`, `-t` | Token de sessão local (também aceita `ALLBAY_TOKEN`) |
+| `login` | Autoriza o CLI pelo navegador |
+| `--template <id>` | Edita o template `<id>` (rascunho) |
+| `publish --template <id>` | Publica o rascunho e coloca no ar |
+| `logout` | Apaga a sessão salva neste computador |
 | `--dir`, `-d` | Pasta local do tema (padrão: pasta atual) |
 | `--pull` | Só baixa os arquivos e sai (não observa) |
 | `--help`, `-h` | Ajuda |
@@ -63,13 +77,12 @@ npx allbay-editor --token SEU_TOKEN_AQUI
 ## Limites
 
 - Até **100 arquivos** por tema, **5 MiB** no total.
-- Extensões: `.html .liquid .css .js .mjs .jsx .ts .tsx .json .svg .txt .md`.
-- Sem **espaços** nos nomes de arquivo.
+- Extensões e nomes de arquivo: ver [Estrutura](/editor/estrutura#tipos-de-arquivo).
 
 <Warning>
-  O token dá acesso de edição ao seu tema — trate como senha. Não cole em lugares
-  públicos. Se vazar, encerre a sessão pelo painel (ou troque a senha, que revoga
-  as sessões).
+  A sessão do editor local dá acesso de edição aos temas de **todas as lojas** em que você pode
+  editar o tema — trate seu computador como confiável. Para encerrá-la, rode `logout` e, se
+  necessário, saia de todos os dispositivos na sua conta.
 </Warning>
 
 ## Editar com IA

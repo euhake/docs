@@ -3,24 +3,26 @@ title: "Schema"
 description: "Defina opções editáveis no painel — sem tocar no código do tema."
 ---
 
-O schema define as opções de personalização que aparecem no painel **Personalizar
-template**. Assim o dono da loja ajusta cores, textos e imagens sem editar código.
+O schema define as opções de personalização que aparecem no painel. Assim o dono da loja
+ajusta cores, textos e imagens sem editar código.
 
 O arquivo é `config/settings_schema.json`.
+
+<Info>
+  Os temas da galeria (Source, Neon, Lumina, Kopy, Prisma, Eclipse) e os forks deles usam, no
+  painel, o schema **mantido pela AllBay** para aquele tema.
+</Info>
 
 ## Estrutura
 
 ```json
 {
-  "name": "Meu Tema",
-  "author": "Você",
-  "version": "1.0.0",
   "settings": [
     {
       "title": "Cores",
       "fields": [
         {
-          "key": "primary-color",
+          "key": "primary_color",
           "label": "Cor primária",
           "description": "Cor principal da loja",
           "type": "color",
@@ -32,55 +34,96 @@ O arquivo é `config/settings_schema.json`.
 }
 ```
 
+- Cada grupo tem `title` (ou `name`) e `fields` (ou `settings`).
+- Cada campo tem `key` (ou `id`), `label`, `type`, e opcionalmente `description` e `default`.
+- Limites: 50 grupos, 200 campos, 100 opções por `select`.
+
+## Chaves dos campos
+
+A `key` precisa começar com letra e usar só **letras, números e `_`** (até 64 caracteres).
+
+<Warning>
+  **Hífen não é permitido.** Um campo com `"key": "primary-color"` é **ignorado**. Use
+  `primary_color`.
+</Warning>
+
 ## Acessando os valores
 
-Os valores ficam no global `config`. A chave converte hífens em underscores:
+Os valores ficam no global `config` (e em `settings`), com a mesma chave do campo:
 
 | Chave no schema | Acesso no Liquid |
 | --- | --- |
-| `primary-color` | `config.primary_color` |
-| `hero-image` | `config.hero_image` |
+| `primary_color` | `config.primary_color` |
+| `hero_image` | `config.hero_image` |
 
 ```liquid
 <style>:root{ --primary: {{ config.primary_color | hex_to_hsl }}; }</style>
-<img src="{{ config.hero_image | cdn_url: 'settings' }}" />
+{% if config.hero_image %}<img src="{{ config.hero_image }}" alt="">{% endif %}
 ```
+
+Um campo sem valor usa o `default` — desde que o tema tenha o próprio
+`config/settings_schema.json`. Sem esse arquivo, os valores chegam como foram salvos; use
+`| default:` no Liquid. Imagens já chegam como URL pronta (ver [Imagens](/editor/imagens)).
 
 ## Tipos de campo
 
 | Tipo | Guarda | Observação |
 | --- | --- | --- |
-| `text` | texto de uma linha | |
-| `textarea` | texto multilinha | |
-| `wysiwyg` | HTML (editor rico) | |
-| `color` (`color-picker`) | cor hex | |
-| `number` (`range`) | número | aceita `min`/`max` |
+| `text` | texto de uma linha | até 5000 caracteres (`max_length` reduz) |
+| `textarea` | texto | até 20000 caracteres (`max_length` reduz) |
+| `wysiwyg` | HTML (editor rico) | até 40000 caracteres |
+| `color` (`color-picker`) | cor | exatamente `#RRGGBB` |
+| `number` (`range`) | número **inteiro** | aceita `min`/`max` |
 | `checkbox` (`boolean`) | verdadeiro/falso | |
 | `select` | uma opção | requer `options` |
-| `url` | URL validada | |
-| `image` (`image_picker`) | imagem | guarda o hash → serve pelo CDN |
-| `images` | várias imagens | aceita `max_items` |
-| `array` | lista de itens | itens com `fields` aninhados |
-| `products` (`packages`) | seleção de produtos | referências; aceita `max_items` |
+| `url` | link | `https://…`, `http://…` ou caminho `/…` |
+| `image` (`image_picker`) | imagem | chega como URL pronta |
+| `images` | várias imagens | `max_items` (padrão 5, máx. 20) |
+| `array` | lista de itens | itens com `fields` próprios (ver abaixo) |
+| `products` (`product`, `packages`) | seleção de produtos | `max_items` (padrão 12, máx. 100) |
 
-<Info>
-  As imagens do tema entram por campos `image`/`images` do schema (não como
-  arquivos no tema) e são servidas pelo CDN — por isso o repositório do tema é
-  só texto.
-</Info>
+<Note>
+  `textarea` hoje **não aceita quebras de linha**. Para textos com parágrafos, use `wysiwyg`.
+</Note>
+
+### `array`
+
+Cada item tem até 20 campos, dos tipos `text`, `checkbox`, `number`, `select`, `color`,
+`url`, `image` e `products`. `max_items`: padrão 50, máximo 200.
+
+```json
+{
+  "key": "faq",
+  "label": "Perguntas frequentes",
+  "type": "array",
+  "fields": [
+    { "key": "question", "label": "Pergunta", "type": "text" },
+    { "key": "answer", "label": "Resposta", "type": "text" }
+  ]
+}
+```
+
+```liquid
+{% for item in config.faq %}
+  <h3>{{ item.question }}</h3><p>{{ item.answer }}</p>
+{% endfor %}
+```
+
+<Warning>
+  Um campo `image` dentro de um item de `array` hoje **não pode ser exibido** no tema. Use
+  campos `image`/`images` no primeiro nível do schema.
+</Warning>
 
 ## Exemplo com vários campos
 
 ```json
 {
-  "name": "Meu Tema",
-  "version": "1.0.0",
   "settings": [
     {
       "title": "Cabeçalho",
       "fields": [
         { "key": "logo", "label": "Logo", "type": "image" },
-        { "key": "fixed-header", "label": "Cabeçalho fixo", "type": "checkbox", "default": true },
+        { "key": "fixed_header", "label": "Cabeçalho fixo", "type": "checkbox", "default": true },
         {
           "key": "layout", "label": "Layout", "type": "select",
           "options": [{ "value": "wide", "label": "Largo" }, { "value": "boxed", "label": "Caixa" }],
@@ -98,7 +141,8 @@ Os valores ficam no global `config`. A chave converte hífens em underscores:
 }
 ```
 
-<Note>
-  A validação é por tipo: um campo `color` só aceita hex, `select` só aceita as
-  `options`, `number` respeita `min`/`max`. Valor inválido é recusado no servidor.
-</Note>
+## Validação
+
+O servidor valida cada valor pelo tipo: `color` só aceita `#RRGGBB`, `select` só aceita as
+`options`, `number` respeita `min`/`max`, `url` não aceita `javascript:`. Valores inválidos ou
+chaves que não existem no schema são **recusados**, com a lista de erros.

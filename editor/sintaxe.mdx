@@ -1,16 +1,12 @@
 ---
 title: "Sintaxe"
-description: "A AllBay usa Liquid padrão — {% %} para lógica e {{ }} para saída."
+description: "Liquid com {% %} para lógica e {{ }} para saída — e as diferenças que importam."
 ---
 
-Os temas da AllBay são renderizados com **Liquid**, usando os **delimitadores padrão**:
+Os temas da AllBay são renderizados com **Liquid**, usando os delimitadores de sempre:
 
 - `{% ... %}` — **lógica** (tags: condicionais, laços, includes).
 - `{{ ... }}` — **saída** (imprime o valor de uma variável).
-
-<Note>
-  A AllBay usa o Liquid **padrão**. Assim, realce de sintaxe, formatadores e assistentes de IA funcionam sem configuração especial.
-</Note>
 
 ## Saída de variáveis
 
@@ -24,18 +20,24 @@ Os temas da AllBay são renderizados com **Liquid**, usando os **delimitadores p
 ```liquid
 {% if store.maintenance %}
   <p>Loja em manutenção.</p>
-{% elsif store.auth %}
-  <p>Faça login para continuar.</p>
+{% elsif logged_in %}
+  <p>Olá, {{ user.name }}!</p>
 {% else %}
   <p>Bem-vindo!</p>
 {% endif %}
 
-{% unless user %}
+{% unless logged_in %}
   <a href="/login">Entrar</a>
 {% endunless %}
 ```
 
-Operadores: `==`, `!=`, `>`, `<`, `>=`, `<=`, `and`, `or`, `contains`.
+Operadores: `==`, `!=`, `>`, `<`, `>=`, `<=`, `and`, `or`, `contains`, `not`.
+
+<Warning>
+  **O que é "falso" na AllBay é diferente do Liquid tradicional:** `nil`, `false`,
+  **`0`** e **`""`** (texto vazio) são falsos. Uma **lista vazia `[]` é verdadeira**.
+  Para testar se uma lista tem itens, use `{% if lista.size > 0 %}`.
+</Warning>
 
 ## Laços
 
@@ -62,7 +64,7 @@ Variáveis do laço: `forloop.index` (começa em 1), `forloop.index0` (em 0), `f
 Transforme valores com o operador pipe `|`, encadeável:
 
 ```liquid
-{{ 29.90 | format_price }}
+{{ 29.90 | money }}
 {{ store.name | upcase | truncate: 20 }}
 ```
 
@@ -70,14 +72,19 @@ Ver a lista completa em [Filtros](/editor/filtros).
 
 ## Componentes e layouts
 
-Use `{% render %}` para incluir um componente, e a cadeia de layouts para envolver a página:
+Use `{% render %}` para incluir um componente e um layout para envolver a página:
 
 ```liquid
 {% render 'components/navbar' %}
 ```
 
-Ver [Tags](/editor/tags) e [Estrutura](/editor/estrutura) para os detalhes de componentes, layouts e o carregamento de dados com `{% load %}`.
+Ver [Tags](/editor/tags) e [Estrutura](/editor/estrutura) para os detalhes de componentes,
+layouts e o carregamento de dados com `{% load %}`.
 
-<Warning>
-  Por segurança, apenas um conjunto controlado de tags e filtros é permitido. Tags perigosas (que leem arquivos arbitrários, por exemplo) são bloqueadas pelo servidor. Ver [Tags](/editor/tags).
-</Warning>
+## Tags e filtros permitidos
+
+- Só existem as **tags** e os **filtros** listados em [Tags](/editor/tags) e
+  [Filtros](/editor/filtros). Uma tag ou filtro fora da lista é **erro**: a página não renderiza.
+- `{% render %}` e `{% include %}` só leem arquivos **do próprio tema**.
+- Páginas muito pesadas ou lentas para gerar não são exibidas — mantenha laços e `load`
+  enxutos.

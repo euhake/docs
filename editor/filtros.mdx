@@ -10,38 +10,74 @@ Filtros transformam valores com o operador pipe `|`, e podem ser encadeados:
 {{ store.name | upcase | truncate: 20 }}
 ```
 
-Apenas filtros da allowlist são permitidos.
+Apenas os filtros desta página existem. Um filtro fora da lista é **erro**: a página não renderiza.
 
 ## Filtros da AllBay
 
 | Filtro | O que faz | Exemplo |
 | --- | --- | --- |
-| `money` | Formata como moeda, na moeda da loja | `29.90` → `R$ 29,90` |
+| `money` | Formata como moeda da loja (`BRL`, `USD` ou `EUR`); recebe o valor **em reais** | `29.90` → `R$ 29,90` |
 | `format_price` | Alias de `money` | `29.90` → `R$ 29,90` |
-| `hex_to_hsl` | Hex → HSL (sem a função `hsl()`) | `#ff0000` → `0 100% 50%` |
-| `cdn_url` | URL assinada de imagem no CDN (a partir do hash) | `{{ p.image \| cdn_url: 'products', p.id }}` |
+| `hex_to_hsl` | Hex de 6 dígitos → HSL (sem `hsl()`); valor inválido vira `0 0% 0%` | `#ff0000` → `0 100% 50%` |
+| `cdn_url` | URL de imagem a partir do **hash** (ver abaixo) | `{{ p.image \| cdn_url: 'products', p.id, 'image' }}` |
 | `cdn` | Alias de `cdn_url` |  |
-| `asset_url` | Caminho seguro pra um arquivo do tema | `{{ 'app.js' \| asset_url }}` → `/assets/app.js` |
-| `compact_number` | Número compacto | `1200` → `1.2K` |
-| `stars` | Estrelas cheias/vazias | `4` → `★★★★☆` |
-| `stock_label` | Rótulo de estoque | `0` → `Esgotado` |
-| `percent_off` | % de desconto (preço vs comparação) | `→ 20%` |
-| `slugify` | Texto → slug | `Plano VIP` → `plano-vip` |
-| `time_ago` | Tempo relativo (pt-BR) | `→ há 2 dias` |
-| `date_format` | Data por extenso (pt-BR) |  |
-| `placeholder` | Usa o fallback se o valor está vazio | `{{ x \| placeholder: '—' }}` |
-| `default` | Fallback só pra `nil`/`false`/`""`/`[]` (o zero passa) | `{{ 0 \| default: '100+' }}` → `0` |
+| `asset_url` | Caminho de um arquivo estático | `{{ 'app.js' \| asset_url }}` → `/assets/app.js` |
+| `compact_number` | Número compacto | `1200` → `1.2K` · `2500000` → `2.5M` |
+| `stars` | Estrelas (0–5, arredondado) | `4` → `★★★★☆` |
+| `stock_label` | Rótulo de estoque | `0` → `Esgotado` · `12` → `12 em estoque` · `nil` → `Ilimitado` |
+| `percent_off` | % de desconto, **só o número** | `{{ 80 \| percent_off: 100 }}` → `20` |
+| `slugify` | Texto → slug | `Plano VIP Ação` → `plano-vip-acao` |
+| `time_ago` | Tempo relativo (pt-BR; minutos, horas ou dias) | `→ há 2 dias` |
+| `date_format` | Data por extenso (pt-BR) | `→ 23 de outubro de 2026` |
+| `placeholder` | Usa o fallback se o valor for `nil` ou `""` | `{{ x \| placeholder: '—' }}` |
+| `default` | Fallback para `nil`, `false`, `""` e `[]` (o zero passa) | `{{ 0 \| default: '100+' }}` → `0` |
+
+Exemplo de selo de desconto:
+
+```liquid
+{% assign off = product.price | percent_off: product.comparison_price %}
+{% if off > 0 %}<span>-{{ off }}%</span>{% endif %}
+```
+
+### `cdn_url`
+
+Quase todas as imagens já chegam ao tema como **URL pronta** — use direto, sem filtro
+(ver [Imagens](/editor/imagens)). `cdn_url` só é necessário para as imagens que chegam como
+**hash**, como as de `{% load "products" %}`, `{% load "product" %}` e `{% load "categories" %}`:
+
+```liquid
+{% load "products", limit: 8 %}
+{% for p in products %}
+  {% assign img = p.image | cdn_url: 'products', p.id, 'image' %}
+  {% if img != "" %}<img src="{{ img }}" alt="{{ p.name }}">{% endif %}
+{% endfor %}
+```
+
+- Argumentos: `hash | cdn_url: '<tipo>', <id>, '<campo>'` — tipo `products`, `variants` ou
+  `categories`; campo `image` ou `banner`. **Os quatro são necessários.**
+- Gera uma imagem **WebP de 256 px**.
+- Devolve **vazio** se a imagem não puder ser servida — sempre teste antes de usar.
+- Imagens animadas e de galeria não são resolvidas por este filtro.
+
+## Filtros do Liquid
+
+- **Texto:** `upcase`, `downcase`, `capitalize`, `truncate`, `truncatewords`, `strip_html`,
+  `strip_newlines`, `escape`, `escape_once`, `newline_to_br`, `replace`, `replace_first`,
+  `replace_last`, `remove`, `remove_first`, `remove_last`, `append`, `prepend`, `split`,
+  `slice`, `strip`, `lstrip`, `rstrip`, `normalize_whitespace`, `number_of_words`.
+- **URL e codificação:** `url_encode`, `url_decode`, `uri_escape`, `cgi_escape`,
+  `xml_escape`, `base64_encode`, `base64_decode`, `sha256`, `hmac_sha256`.
+- **Número:** `plus`, `minus`, `times`, `divided_by`, `modulo`, `round`, `floor`, `ceil`,
+  `abs`, `at_least`, `at_most`, `to_integer`.
+- **Lista:** `size`, `first`, `last`, `join`, `sort`, `sort_natural`, `reverse`, `map`,
+  `where`, `where_exp`, `reject`, `reject_exp`, `find`, `find_exp`, `find_index`,
+  `find_index_exp`, `has`, `has_exp`, `group_by`, `group_by_exp`, `uniq`, `compact`,
+  `concat`, `sum`, `sample`, `array_to_sentence_string`.
+- **Data:** `date` (ex.: `{{ post.published_at_iso | date: '%d/%m/%Y' }}`), `date_to_string`,
+  `date_to_long_string`, `date_to_rfc822`, `date_to_xmlschema`.
+- **JSON:** `json` (serializa um objeto — útil para passar dados a um script).
+- **Outros:** `raw`.
 
 <Note>
-  Use `money`/`format_price` para preços — o `cdn_url` recebe o **hash** da imagem (não uma URL pronta) e assina a URL final.
+  Não existem: `push`, `pop`, `shift`, `unshift`, `jsonify`, `inspect`.
 </Note>
-
-## Filtros nativos
-
-Também estão disponíveis os filtros padrão do Liquid:
-
-- **Texto:** `upcase`, `downcase`, `capitalize`, `truncate`, `truncatewords`, `strip_html`, `escape`, `newline_to_br`, `replace`, `append`, `prepend`, `split`, `strip`, `lstrip`, `rstrip`, `url_encode`, `url_decode`.
-- **Número:** `plus`, `minus`, `times`, `divided_by`, `modulo`, `round`, `floor`, `ceil`, `abs`, `at_least`, `at_most`.
-- **Array:** `size`, `first`, `last`, `join`, `sort`, `sort_natural`, `reverse`, `map`, `where`, `uniq`, `compact`, `concat`.
-- **Data:** `date` (ex: `{{ post.created_at | date: '%d/%m/%Y' }}`).
-- **JSON:** `json` (serializa um objeto — útil em `pages/package` e `checkout`).

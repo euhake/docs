@@ -3,14 +3,13 @@ title: "Claude Code"
 description: "Edite seu tema AllBay com o Claude Code, por linguagem natural."
 ---
 
-O [Claude Code](https://claude.com/claude-code) é o agente de código da Anthropic
-(terminal ou extensão do VS Code). Com o [Editor Local](/editor/editor-local),
-você descreve o que quer e o Claude edita os arquivos do tema.
+O [Claude Code](https://claude.com/claude-code) é o agente de código da Anthropic (terminal ou
+extensão do VS Code). Com o [Editor Local](/editor/editor-local), você descreve o que quer e o
+Claude edita os arquivos do tema.
 
 ## Pré-requisitos
 
-- Arquivos do tema baixados com o [Editor Local](/editor/editor-local)
-  (`npx allbay-editor --token ...`) rodando na pasta.
+- O [Editor Local](/editor/editor-local) com login feito e rodando na pasta do tema.
 - Claude Code instalado.
 
 ## Passo a passo
@@ -19,13 +18,12 @@ você descreve o que quer e o Claude edita os arquivos do tema.
   <Step title="Baixe o tema e deixe o CLI rodando">
     ```bash
     mkdir meu-tema && cd meu-tema
-    npx allbay-editor --token SEU_TOKEN_AQUI
+    npx allbay-editor@latest --template SEU_ID_DO_TEMPLATE
     ```
     Deixe esse terminal aberto — ele sincroniza cada save.
   </Step>
   <Step title="Abra o Claude Code na pasta">
-    Em outro terminal, na mesma pasta, rode `claude` (ou abra a pasta pela
-    extensão do VS Code).
+    Em outro terminal, na mesma pasta, rode `claude` (ou abra a pasta pela extensão do VS Code).
   </Step>
   <Step title="Peça a mudança">
     Descreva em português:
@@ -35,33 +33,59 @@ você descreve o que quer e o Claude edita os arquivos do tema.
   </Step>
 </Steps>
 
+## Conecte a documentação ao Claude (MCP)
+
+Esta documentação tem um servidor **MCP**: com ele, o Claude consulta as páginas da AllBay
+sozinho enquanto trabalha, em vez de adivinhar sintaxe e objetos. Rode uma vez, na pasta do tema:
+
+```bash
+claude mcp add --transport http allbay-docs https://allbay.mintlify.app/mcp
+```
+
+O servidor oferece busca na documentação e leitura das páginas. Para conferir, rode `/mcp`
+dentro do Claude Code.
+
+<Tip>
+  Para outras IAs, a documentação inteira também está em texto em
+  [llms.txt](https://allbay.mintlify.app/llms.txt) (índice) e
+  [llms-full.txt](https://allbay.mintlify.app/llms-full.txt) (conteúdo completo).
+</Tip>
+
 ## Dê contexto ao Claude (recomendado)
 
-Crie um arquivo **`CLAUDE.md`** na raiz do tema com as regras da plataforma —
-assim o Claude usa a sintaxe e os objetos certos:
+Crie um arquivo **`CLAUDE.md`** na raiz do tema com as regras da plataforma. Ele fica só na sua
+máquina (o CLI não envia `.md`):
 
 ```md CLAUDE.md
 # Tema AllBay (Liquid)
 
-- Motor: **Liquid padrão** — `{% %}` para lógica, `{{ }}` para saída.
-- Componentes: `{% render 'components/nome' %}`. Dados: `{% load "products", limit: 8 %}`.
-- Objetos globais: `store`, `theme`, `config`, `user`, `categories`, `gateways`,
-  `socials`, `products`, `product`/`package`, `order`, `cart`.
-- Filtros úteis: `money`/`format_price`, `hex_to_hsl`, `cdn_url`, `slugify`, `stars`.
-- Preços com `| money`. Imagens de produto já vêm assinadas; `config`/`post` usam `| cdn_url`.
-- Login é da plataforma (não escreva `pages/login`).
-- Docs: https://docs.allbay.io/editor/introducao
+- Lógica `{% %}`, saída `{{ }}`. Componentes: `{% render 'components/nome', var: valor %}`
+  (componentes só veem globais e parâmetros).
+- Falsos: nil, false, 0 e "". Lista vazia [] é verdadeira — use `lista.size > 0`.
+- Dados: `{% load "packages", limit: 8 %}` (cards com imagens prontas).
+  Alias logo após a entidade: `{% load "product" as p, slug: "x" %}`. Ids sempre entre aspas.
+- Globais: store, theme, config, settings, user, customer, logged_in, categories, products,
+  packages, product, gateways, socials, order, orders, posts, post, cart, terms, query, pathname.
+- Preços com `| money` (valores em reais). Desconto: `price | percent_off: comparison_price` → número.
+- Imagens já vêm como URL pronta: use direto e teste antes (`{% if img %}`).
+  `cdn_url` só para hash de `load "products"/"product"/"categories"`:
+  `{{ x.image | cdn_url: 'products', x.id, 'image' }}`.
+- Schema: `config/settings_schema.json`; chaves só com letras, números e `_` (sem hífen).
+- Arquivos novos: só .liquid/.html/.css/.js, nomes em minúsculas até 32 caracteres,
+  nas pastas pages, templates, layouts, components, snippets, sections, styles, scripts, assets.
+- Login é da plataforma (não crie pages/login).
+- Docs: https://allbay.mintlify.app/editor/introducao (MCP: https://allbay.mintlify.app/mcp)
 
 Faça UMA mudança por vez e confira no preview antes de seguir.
 ```
 
 <Tip>
-  Referencie as páginas de [Sintaxe](/editor/sintaxe),
-  [Tags](/editor/tags), [Filtros](/editor/filtros) e
+  Referencie as páginas de [Sintaxe](/editor/sintaxe), [Tags](/editor/tags),
+  [Filtros](/editor/filtros), [Imagens](/editor/imagens) e
   [Variáveis Globais](/editor/variaveis-globais) para o Claude acertar de primeira.
 </Tip>
 
 <Warning>
-  Faça mudanças pequenas e confira o preview a cada passo. Antes de mexidas
-  grandes, exporte o tema como backup pelo painel.
+  Faça mudanças pequenas e confira o preview a cada passo. Antes de mexidas grandes, baixe o
+  tema em `.zip` pelo painel como backup.
 </Warning>

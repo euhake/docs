@@ -1,67 +1,133 @@
 ---
 title: "Tags"
-description: "Tags de lógica e as tags próprias da AllBay — load, section, render."
+description: "Tags de lógica e as tags próprias da AllBay — load, section, render, tailwindcss."
 ---
 
-Tags ficam entre `{% %}`. Por segurança, apenas um conjunto controlado é permitido — qualquer tag fora da lista **não compila**.
+Tags ficam entre `{% %}`. Apenas as tags desta página existem — qualquer outra é **erro** e a
+página não renderiza.
 
 ## Controle de fluxo
 
-Padrão do Liquid: `if`, `elsif`, `else`, `unless`, `case`/`when`, `for`, `tablerow`, `cycle`, `break`, `continue`, `assign`, `capture`, `increment`, `decrement`, `echo`, `comment`, `raw`. Ver exemplos em [Sintaxe](/editor/sintaxe).
+`if`, `elsif`, `else`, `unless`, `case`/`when`, `for`, `tablerow`, `cycle`, `break`,
+`continue`, `assign`, `capture`, `increment`, `decrement`, `echo`, `liquid`, `comment`,
+`#` (comentário de linha) e `raw`. Ver exemplos em [Sintaxe](/editor/sintaxe).
 
-## `render` — componentes
+## `render`: componentes
 
-Inclui um componente. Nome simples procura em `components/` e `snippets/`:
+Inclui um componente, com variáveis próprias:
 
 ```liquid
 {% render 'components/product-card', package: p %}
+{% render 'product-card', package: p %}
 ```
 
-## `section` — blocos de layout
+Com um nome simples, a busca é: raiz do tema → `snippets/` → `components/`.
 
-Renderiza `sections/<nome>`. Profundidade máxima de aninhamento: 6.
+O componente enxerga as variáveis globais, os resultados de `{% load %}` e os parâmetros que
+você passar. Variáveis criadas na página com `assign`/`capture` **não** chegam ao componente —
+passe como parâmetro. `{% include %}` também existe e compartilha todas as variáveis da página.
+
+## `layout` e `block`
+
+A página declara o layout na primeira linha; o resto dela entra no `{% block %}` do layout.
+Parâmetros depois da vírgula viram variáveis dentro do layout:
+
+```liquid layouts/layout.liquid
+<html>
+  <head><title>{{ page_title }} · {{ store.name }}</title></head>
+  <body>
+    <main>{% block %}{% endblock %}</main>
+  </body>
+</html>
+```
+
+```liquid pages/index.liquid
+{% layout "layouts/layout", page_title: 'Home' %}
+
+<h1>Bem-vindo</h1>
+```
+
+Blocos com nome (`{% block conteudo %}`) só funcionam se o layout declarar um bloco com o
+mesmo nome. Ver também o layout automático `layouts/base.liquid` em
+[Páginas](/editor/paginas#layouts).
+
+## `section`: blocos de layout
+
+Renderiza `sections/<nome>`. O nome usa letras minúsculas, números, `_` e `-`.
+Profundidade máxima de aninhamento: 6.
 
 ```liquid
 {% section 'hero' %}
 ```
 
-## `load` — dados dinâmicos
+Se o tema não tiver o arquivo, a AllBay usa a seção da plataforma de mesmo nome, quando
+existe: `hero`, `product-grid`, `benefits`, `announcement`, `category_carousel`,
+`category_with_products`. Uma seção que não existe ou que falha **não aparece** (sem erro).
 
-Carrega dados da loja direto no template. O resultado vira uma variável com o nome da entidade (ou o `as <alias>`):
+## `tailwindcss`
+
+Insere o `<link>` do CSS do Tailwind gerado a partir do `tailwind.config.json` do tema:
 
 ```liquid
-{% load "products", limit: 8, category_id: 3 %}
+<head>
+  {% tailwindcss %}
+</head>
+```
+
+## `load`: dados dinâmicos
+
+Carrega dados da loja direto no template. O resultado vira uma variável com o nome da
+entidade, ou com o nome dado por `as`:
+
+```liquid
+{% load "products", limit: 8, category_id: "1538117695638261760" %}
 {% for p in products %}
   {{ p.name }}
 {% endfor %}
 
-{% load "product", slug: "plano-vip" as produto %}
-{{ produto.name }}
+{% load "product" as produto, slug: "plano-vip" %}
+{% if produto.name %}{{ produto.name }}{% endif %}
 ```
 
-<Note>
-  Se o carregamento não retorna nada, a variável **não é sobrescrita** — útil pra dados injetados pelo servidor (ex: `orders` na área do cliente).
-</Note>
+<Warning>
+  - O `as` vem **logo depois do nome da entidade**: `{% load "product" as produto, slug: "x" %}`.
+  - **Ids são texto**: escreva `category_id: "123..."` (entre aspas). Um número faz o `load` falhar.
+  - Os parâmetros são separados por vírgula — um texto com vírgula não funciona como valor.
+</Warning>
+
+Comportamento:
+
+- Se o `load` falhar (parâmetro inválido, tempo esgotado), a variável **não é alterada**.
+- `product` e `post` **não encontrados** viram uma lista vazia `[]`, que é verdadeira em
+  `{% if %}` — teste um campo: `{% if produto.name %}`.
+- Até **20** `load` por página, contando o layout declarado com `{% layout %}` (só o
+  `layouts/base.liquid` tem os seus próprios 20). Os excedentes são ignorados.
+- O resultado vale na página, no layout, em `{% section %}` e dentro de `{% render %}`.
 
 ### Entidades disponíveis
 
-Você pode carregar exatamente estas entidades (até 12 `load` por página):
-
 | Entidade | Parâmetros | Retorna |
 | --- | --- | --- |
-| `products` | `limit` (12/50), `page`, `category_id` | lista de produtos |
-| `packages` | `limit`, `page`, `category_id`, `id` | alias de `products`; `id:` = lista em destaque |
+| `products` | `limit` (padrão 12, máx. 50), `page`, `category_id` | lista de produtos **com imagens em hash** (ver [Imagens](/editor/imagens)) |
+| `packages` | `limit`, `page`, `category_id`, `id` (lista de ids) | `{ data, size, total, meta }` com produtos no formato de card, imagens prontas; `id:` traz uma lista em destaque |
 | `product` | `slug` | um produto pelo slug |
-| `categories` | `limit` (20/50) | árvore de categorias |
-| `product_reviews` | `slug`, `limit` | avaliações \+ resumo de um produto |
-| `package_feedbacks` | `package_id`, `limit` | avaliações por id (`{data, size, total}`) |
-| `feedbacks` | `limit`, `list` | `{feedback_settings, feedbacks[]}` da loja |
-| `posts` | `limit`, `page` | índice do blog (`{data, meta}`) |
+| `categories` | `limit` (padrão 20, máx. 50 categorias principais) | árvore de categorias |
+| `product_reviews` | `slug`, `limit` (padrão 10, máx. 50) | `{ summary: { total, average, distribution }, items }` |
+| `package_feedbacks` | `package_id`, `limit` (padrão e máx. 100) | cria `feedback_settings`, `package_feedback_summary` e `package_feedbacks` |
+| `feedbacks` | `limit` (padrão 10, máx. 50) | cria `feedback_settings` e `feedbacks` |
+| `posts` | `limit` (padrão 20, máx. 50), `page` | `{ data, meta }` do blog |
 | `post` | `slug` | um post pelo slug |
-| `gateways` | — | métodos de pagamento públicos |
-| `variables` | `limit` | campos de checkout (escopo CHECKOUT) |
+| `gateways` | — | métodos de pagamento ativos (`{ gateway, method }`) |
+| `variables` | `limit` (padrão e máx. 100) | campos de checkout da loja |
 | `checkout_fields` | `limit` | alias de `variables` |
 
+<Note>
+  Em `packages`, `size` e `total` contam os itens **desta página**; o total do catálogo está
+  em `meta.total`. `package_feedbacks` e `feedbacks` criam variáveis com nomes fixos e
+  ignoram o `as`.
+</Note>
+
 <Info>
-  **`orders`** (pedidos do cliente) não é carregado por `load` — é **injetado pelo servidor** na área do cliente (`pages/account/orders.liquid`). Um `{% load 'orders' %}` num template preserva esse global injetado.
+  **`orders`** (pedidos do cliente) não é carregado por `load` — é preenchido pela AllBay
+  nas páginas `/account/*`. Um `{% load "orders" %}` não altera esse valor.
 </Info>

@@ -1,0 +1,107 @@
+---
+title: "Imagens"
+description: "Como as imagens chegam ao tema — URLs prontas da CDN e quando usar cdn_url."
+---
+
+As imagens da loja (logo, banners, produtos, categorias, imagens do schema) são servidas pela
+**CDN da AllBay**. Na grande maioria dos casos elas chegam ao tema como **URL pronta**:
+use direto no `src`, sem filtro.
+
+```liquid
+{% if product.image %}
+  <img src="{{ product.image }}" alt="{{ product.name }}">
+{% endif %}
+```
+
+## Regras de ouro
+
+1. **Use a URL como ela vem.** Não monte nem altere URLs de imagem.
+2. **Sempre teste antes de usar.** Uma imagem que não pode ser servida chega **vazia**
+   (`""`, `null` ou ausente) — nunca escreva `<img src="">`.
+3. **`cdn_url` só para hash.** Ele existe apenas para as imagens que chegam como hash
+   (ver [abaixo](#quando-usar-cdn_url)).
+
+## Formato
+
+```
+https://cdn.allbay.io/i/<id>.webp?w=512
+```
+
+O parâmetro `w` é a largura entregue — a AllBay já escolhe o tamanho certo para cada campo.
+
+## Onde as imagens chegam prontas
+
+| Campo | Tamanho entregue |
+| --- | --- |
+| `theme.logo`, `shop.logo_url` | 64 px (ícone) |
+| `theme.banner`, `shop.banner_url` | 1024 px |
+| `theme.favicon`, `favicon` | 64 px, estático |
+| `config.hero_image` · `config.background_image` | 1024 px · 512 px |
+| `theme.hero_image` · `theme.background_image` | original |
+| Campos `image`/`images` do [schema](/editor/schema) em `config`/`settings` | original |
+| `config.hero_banner` / `config.hero_banners` | 2048 px |
+| Card de produto (`products`, `packages.data`, `category.products`): `image`, `banner`, `image_url`, `banner_url` | 512 px |
+| Produto da página (`product`): `image`, `banner`, `image_url`, `gallery[]`, `images[]` | até 1024 px |
+| Categorias: `image`, `banner`, `image_url`, `banner_url`, `icon_url` | — |
+| `post.image` | original |
+| Produto em avaliações (`feedbacks`) | 64 px |
+
+<Warning>
+  - No **card**, `image`, `banner`, `image_url` e `banner_url` são a **mesma** imagem (o banner do
+    produto, ou a imagem quando não há banner). Na **página do produto**, `image_url` é a imagem
+    do produto e `images` começa pelo banner, seguido da galeria.
+  - `gallery[]` e `images[]` podem conter **vídeos** (`.mp4`). Confira a extensão antes de usar
+    em `<img>`: `{% unless img contains '.mp4' %}…{% endunless %}`.
+  - O logo vem pequeno. Para um logo grande, crie um campo de imagem no schema.
+</Warning>
+
+## Quando usar `cdn_url`
+
+Os resultados destes `load` trazem as imagens como **hash**, não como URL:
+
+- `{% load "products" %}`
+- `{% load "product" %}`
+- `{% load "categories" %}`
+
+Converta com `cdn_url`, informando o tipo, o id e o campo:
+
+```liquid
+{% load "products", limit: 8 %}
+{% for p in products %}
+  {% assign img = p.image | cdn_url: 'products', p.id, 'image' %}
+  {% if img != "" %}<img src="{{ img }}" alt="{{ p.name }}">{% endif %}
+{% endfor %}
+```
+
+| Tipo | Campos |
+| --- | --- |
+| `'products'` | `'image'`, `'banner'` |
+| `'variants'` | `'image'`, `'banner'` |
+| `'categories'` | `'image'`, `'banner'` |
+
+O resultado é uma imagem WebP de **256 px**. Imagens de galeria e imagens animadas não são
+resolvidas por `cdn_url`.
+
+<Tip>
+  Prefira `{% load "packages" %}` a `{% load "products" %}` quando for mostrar cards: ele já
+  devolve os produtos no formato de card, com as **imagens prontas**.
+</Tip>
+
+## Imagens do schema
+
+Os campos `image` e `images` do [schema](/editor/schema) guardam a imagem enviada pelo dono e
+chegam em `config`/`settings` já como **URL pronta**:
+
+```liquid
+{% if config.hero_image %}<img src="{{ config.hero_image }}" alt="">{% endif %}
+
+{% for img in config.gallery %}
+  {% if img != "" %}<img src="{{ img }}" alt="">{% endif %}
+{% endfor %}
+```
+
+<Note>
+  Hoje só os campos `image`/`images` **de primeiro nível** do schema viram URL. Um campo
+  `image` **dentro de um item de `array`** chega como hash e não pode ser exibido — evite
+  esse formato por enquanto.
+</Note>

@@ -3,53 +3,107 @@ title: "Páginas"
 description: "Cada rota da loja mapeia para um arquivo de página do tema."
 ---
 
-Quando um visitante acessa uma URL, a AllBay identifica o tipo de página, carrega
-os dados relevantes e renderiza o arquivo correspondente, com as
-[variáveis globais](/editor/variaveis-globais) mais as variáveis específicas
-daquela página.
+Quando um visitante acessa uma URL, a AllBay identifica o tipo de página, carrega os dados
+relevantes e renderiza o arquivo correspondente, com as
+[variáveis globais](/editor/variaveis-globais) mais as variáveis específicas daquela página.
 
 ## Mapa de rotas
 
 | Rota | Arquivo (Kopy) | Variáveis específicas |
 | --- | --- | --- |
-| `/` | `pages/index.liquid` | — (use `{% load %}`) |
-| `/products` · `/category/:slug` | `pages/category.liquid` | `category`, subcategorias, produtos (paginados) |
-| `/products/:slug` | `pages/package.liquid` | `package` (preço, estoque, variações, campos, descrição) |
-| `/search` | `pages/search.liquid` | resultados paginados por `query` |
-| `/checkout` | `pages/checkout.liquid` | carrinho + `discord.enabled/optional` |
-| `/order/:id` | `pages/order.liquid` | `order` (status, itens, entregas, variáveis, notas) |
-| `/payment/:id` | `pages/payment.liquid` | pagamento pendente (Pix: código + QR em base64) |
-| `/post/:slug` | `pages/post.liquid` | `post` (título, slug, conteúdo HTML, data) |
-| `/blog` | `pages/blog.liquid` | posts paginados |
-| `/account/orders` | `pages/account/orders.liquid` | histórico de pedidos (injetado no servidor) |
-| `/account/affiliate` | `pages/account/affiliate.liquid` | painel de afiliado |
-| `/terms` | `pages/terms.liquid` | termos (HTML) |
-| `/pages/:handle` | `pages/:handle.liquid` | página custom sua |
-| 404 | `pages/not-found.liquid` | — (soft-404, HTTP 200) |
-| manutenção | `pages/maintenance.liquid` | — (quando a loja está pausada) |
+| `/` | `pages/index.liquid` | `products`/`packages` (até 100), `sections`, `showcase`, `recent_feedbacks` |
+| `/products` | `pages/category.liquid` | todos os produtos (até 100), sem `category` |
+| `/collections/:slug` · `/category/:slug` | `pages/category.liquid` | `category`, `collection`, produtos da categoria (até 50) |
+| `/products/:slug` · `/package/:slug` | `pages/package.liquid` | `product`/`package` (produto completo) |
+| `/search` | `pages/search.liquid` | produtos (até 100) — ver [Busca](#busca) |
+| `/checkout` | `pages/checkout.liquid` | `cart` |
+| `/order/:id` | `pages/order.liquid` | `order`, `allowed`, `order_feedback`, `chat_delivery` |
+| `/payment/:id` | `pages/payment.liquid` | `order` (PIX: `pix_code` + `qr_code`) |
+| `/blog` | `pages/blog.liquid` | `posts` (página 1, 20 posts) |
+| `/post/:slug` | `pages/post.liquid` | `post` |
+| `/account` | `pages/account.liquid` (o Kopy não tem — cai no 404) | `orders` |
+| `/account/orders` | `pages/account/orders.liquid` (ou `pages/account`) | `orders` (`{ data, meta }`, 20 por página, `?page=`) |
+| `/account/affiliate` | `pages/account/affiliate.liquid` (ou `pages/account`) | `orders` |
+| `/terms` | `pages/terms.liquid` | `terms` (HTML) |
+| `/pages/:handle` | `pages/:handle.liquid` | página sua (handle: minúsculas, números, `_`, `-`) |
+| 404 | `pages/not-found.liquid` | — |
 
 <Note>
   Os nomes seguem os [aliases de resolução](/editor/estrutura#resolução-de-páginas-aliases):
-  a rota de produto aceita `package` ou `product`, coleção aceita `category` ou
-  `collection`, checkout aceita `checkout` ou `cart`, 404 aceita `not-found` ou
-  `404`.
+  a rota de produto aceita `package` ou `product`, coleção aceita `category` ou `collection`,
+  checkout aceita `checkout` ou `cart`, 404 aceita `not-found` ou `404`.
 </Note>
+
+<Info>
+  Os produtos das listas **não são paginados no servidor**: home, `/products` e busca trazem
+  até 100; a coleção traz até 50, e só as **24 primeiras** categorias vêm com produtos. Para
+  paginar ou buscar o resto, use `{% load "packages", category_id: category.id, page: query.page %}`
+  (ver [Tags](/editor/tags#load-dados-dinâmicos)).
+</Info>
+
+## Busca
+
+Na rota `/search`, o servidor entrega o catálogo (até 100 produtos) e filtra por
+`?category_id=` e `?current_package=` (remove esse produto da lista). O filtro de **texto**
+(`?q=`) é aplicado no navegador pelo tema/SDK. A página não é indexada por buscadores.
+
+## Página não encontrada (404)
+
+- Uma rota inexistente renderiza a sua página 404 com **status HTTP 404** (não indexada).
+- Um produto inexistente também cai na página 404 (`pathname` = `/404`).
+- Uma coleção inexistente (`/collections/x`) renderiza a página de coleção **vazia**.
+- Um post inexistente renderiza a página de post sem `post`.
+
+Sem página 404 no tema, o visitante recebe um 404 simples da plataforma.
+
+## Pedido e pagamento
+
+`/order/:id` e `/payment/:id` **não exigem login**: abrem com a sessão do cliente **ou** com o
+link do pedido (que traz o token de acesso). Sem acesso, `order` fica vazio e `allowed` é
+`false` — mostre uma mensagem nesse caso.
+
+```liquid
+{% if allowed %}
+  Pedido {{ order.status }} — {{ order.price_display }}
+{% else %}
+  <p>Não foi possível abrir este pedido.</p>
+{% endif %}
+```
+
+Quando o pagamento já foi aprovado, `/payment/:id` redireciona para `/order/:id`.
 
 ## Login é sempre da plataforma
 
-A página `/login` **não** é renderizada pelo tema. A AllBay usa login por
-**OAuth2 interno**: ao acessar `/login` (ou qualquer rota que exija sessão sem
-estar logado), o visitante é redirecionado automaticamente para a tela de login
-da plataforma. Você não precisa (nem pode) escrever `pages/login.liquid`.
+A página `/login` **não** é renderizada pelo tema. Ao acessar `/login`, o visitante vai para a
+tela de login da AllBay e volta logado. Um `pages/login.liquid` no tema é ignorado.
 
-<Info>
-  A **área do cliente** (`/account/*`), a de **pedido** (`/order/:id`) e a de
-  **pagamento** (`/payment/:id`) são renderizadas pelo tema (Liquid), mas exigem
-  sessão — sem login, o visitante cai no fluxo de OAuth2 acima.
-</Info>
+A **área do cliente** (`/account*`) é renderizada pelo tema, mas exige login: sem sessão, o
+visitante é levado ao login.
+
+## Manutenção
+
+Não existe página de manutenção separada. Quando a loja está pausada, `store.maintenance` é
+`true` e o catálogo vem vazio — trate isso no seu layout:
+
+```liquid
+{% if store.maintenance %}
+  <p>Voltamos em breve.</p>
+{% else %}
+  …
+{% endif %}
+```
 
 ## Layouts
 
-A cadeia de layouts envolve a página. No Kopy, `layouts/layout.liquid` é o
-documento base (`<html>`, `<head>`, scripts/estilos globais) e a página entra no
-ponto de conteúdo. Ver [Estrutura](/editor/estrutura).
+Há duas formas de envolver as páginas:
+
+- **Layout automático:** crie `layouts/base.liquid` com `{{ content_for_layout }}` onde a página
+  deve entrar. Toda página é renderizada dentro dele.
+- **Layout declarado:** a página começa com `{% layout 'layouts/layout' %}` e o conteúdo dela
+  entra no `{% block %}{% endblock %}` do layout — é o que o Kopy usa. Ver [Tags](/editor/tags#layout-e-block).
+
+<Warning>
+  Se **alguma** página do tema usa `{% layout %}`, toda página que **não** declarar um layout é
+  entregue sem `<html>`/`<head>` (como fragmento). Em temas com layout declarado, declare o
+  layout em todas as páginas.
+</Warning>
